@@ -81,4 +81,10 @@ class BasicTests < Minitest::Test
     assert_sexp('class A; x; end')
     assert_sexp('class A; x; y; end')
   end
+
+  def test_some_constants
+    assert_sexp('X')
+    assert_sexp('::X')
+    assert_sexp('X::Y')
+  end
 end

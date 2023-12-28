@@ -106,6 +106,19 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :const, node.name)
   end
 
+  def visit_constant_path_node(node)
+    if node.parent.nil?
+      # ::X
+      m(node, :colon3, node.child.name)
+    elsif node.child.is_a? Prism::ConstantReadNode
+      # X::Y
+      m(node, :colon2, visit(node.parent), node.child.name)
+    else
+      # X::Y::Z...
+      m(node, :colon2, visit(node.parent), visit(node.child))
+    end
+  end
+
   def visit_integer_node(node)
     m(node, :lit, node.value)
   end
