@@ -118,6 +118,12 @@ class PrismToRubyParserVisitor < Prism::Visitor
         m(node, :lasgn, node.name, visit(node.value)))
   end
 
+  def visit_self_node(node)
+    m(node, :self)
+  end
+
+  # Method definitions
+
   def visit_def_node(node)
     args = if node.parameters
              visit(node.parameters)
