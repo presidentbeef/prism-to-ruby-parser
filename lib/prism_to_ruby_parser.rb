@@ -53,6 +53,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     map_visit(node.arguments)
   end
 
+  def visit_constant_read_node(node)
+    m(node, :const, node.name)
+  end
+
   def visit_integer_node(node)
     m(node, :lit, node.value)
   end
