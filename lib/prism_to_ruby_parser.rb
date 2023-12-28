@@ -58,8 +58,13 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_call_node(node)
-    type = if node.name == :[]= or node.name.match?(/\w\=$/)
+    type = case
+           when node.attribute_write? && node.safe_navigation?
+             :safe_attrasgn
+           when node.attribute_write?
              :attrasgn
+           when node.safe_navigation?
+             :safe_call
            else
              :call
            end
