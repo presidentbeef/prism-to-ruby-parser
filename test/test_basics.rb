@@ -30,4 +30,8 @@ class BasicTests < Minitest::Test
   def test_simple_symbol
     assert_sexp(':abc1')
   end
+
+  def test_simple_assignment
+    assert_sexp('x = 1')
+  end
 end
