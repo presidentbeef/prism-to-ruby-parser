@@ -7,11 +7,21 @@ class PrismToRubyParserVisitor < Prism::Visitor
     new_sexp
   end
 
+  # Create Sexp with given type, set line based
+  # on Prism node, and append the rest of the arguments
   def m(p_node, type, *)
     Sexp.new(type, *).tap do |n|
       yield n if block_given?
 
       set_line(p_node, n)
+    end
+  end
+
+  def m_c(p_node, type, *, concat_arg)
+    m(p_node, type, *) do |n|
+      if concat_arg # might be nil
+        n.concat(concat_arg)
+      end
     end
   end
 
@@ -50,9 +60,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
              :call
            end
 
-    call = m(node, type, visit(node.receiver), node.name) do |n|
-      n.concat(visit(node.arguments)) if node.arguments
-    end
+    call = m_c(node, type, visit(node.receiver), node.name, visit(node.arguments))
 
     if node.block
       call_node_with_block(call, node)
@@ -123,9 +131,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_array_node(node)
-    m(node, :array) do |n|
-      n.concat(map_visit(node.elements))
-    end
+    m_c(node, :array, map_visit(node.elements))
   end
 
   def visit_hash_node(node)
@@ -174,10 +180,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
     m(node, :defn, node.name, args) do |n|
       if node.body
-        # body is a Statements node, but we don't want to wrap it in a :block
-        # so we're grabbing the Statements body directly
-        # HACK?
-        n.concat(map_visit(node.body.body))
+        n.concat(visit_statements_node(node.body, bare: true))
       else
         n << m(node, :nil)
       end
@@ -186,7 +189,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   def visit_parameters_node(node)
     # TODO: Add other types of parameters
-    m(node, :args, *map_visit(node.requireds))
+    m_c(node, :args, map_visit(node.requireds))
   end
 
   def visit_required_parameter_node(node)
@@ -194,11 +197,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_return_node(node)
-    m(node, :return) do |n|
-      if node.arguments
-        n.concat(visit(node.arguments))
-      end
-    end
+    m_c(node, :return, visit(node.arguments))
   end
 
   # Conditionals
