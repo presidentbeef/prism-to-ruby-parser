@@ -105,4 +105,9 @@ class PrismToRubyParserVisitor < Prism::Visitor
   def visit_assoc_node(node)
     [visit(node.key), visit(node.value)]
   end
+
+  # a.y ||= foo
+  def visit_call_or_write_node(node)
+    m(node, :op_asgn, visit(node.receiver), visit(node.value), node.read_name, :'||')
+  end
 end
