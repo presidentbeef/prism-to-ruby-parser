@@ -72,4 +72,12 @@ class PrismToRubyParserVisitor < Prism::Visitor
   def visit_regular_expression_node(node)
     m(node, :lit, Regexp.new(node.unescaped))
   end
+
+  def visit_false_node(node)
+    m(node, :false)
+  end
+
+  def visit_true_node(node)
+    m(node, :true)
+  end
 end
