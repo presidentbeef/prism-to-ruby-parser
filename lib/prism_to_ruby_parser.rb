@@ -231,6 +231,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     end
   end
 
+  def visit_embedded_variable_node(node)
+    m(node, :evstr, visit(node.variable))
+  end
+
   # Classes and such
 
   def visit_instance_variable_read_node(node)
