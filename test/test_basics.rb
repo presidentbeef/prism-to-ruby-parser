@@ -38,4 +38,9 @@ class BasicTests < Minitest::Test
   def test_simple_regex
     assert_sexp('/\d/')
   end
+
+  def test_simple_hash
+    assert_sexp('{}')
+    assert_sexp('{ x: 1 }')
+  end
 end

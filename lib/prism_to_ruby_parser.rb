@@ -86,4 +86,19 @@ class PrismToRubyParserVisitor < Prism::Visitor
       n.concat(map_visit(node.elements))
     end
   end
+
+  def visit_hash_node(node)
+    m(node, :hash) do |n|
+      pairs = node.elements.flat_map do |e|
+        [visit(e.key), visit(e.value)]
+      end
+
+      n.concat pairs
+    end
+  end
+
+  # Hash table key-value
+  def visit_assoc_node(node)
+    [visit(node.key), visit(node.value)]
+  end
 end
