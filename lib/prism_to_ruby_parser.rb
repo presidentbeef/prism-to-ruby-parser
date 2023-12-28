@@ -69,6 +69,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :lit, node.unescaped.to_sym)
   end
 
+  def visit_local_variable_read_node(node)
+    m(node, :lvar, node.name)
+  end
+
   def visit_local_variable_write_node(node)
     m(node, :lasgn, node.name, visit(node.value))
   end
