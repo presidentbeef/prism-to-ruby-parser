@@ -22,4 +22,8 @@ class BasicTests < Minitest::Test
   def test_multiple_statements
     assert_sexp("1\n2")
   end
+
+  def test_simple_string
+    assert_sexp("'hello there'")
+  end
 end

@@ -50,4 +50,8 @@ class PrismToRubyParserVisitor < Prism::Visitor
   def visit_integer_node(node)
     m(node, :lit, node.value)
   end
+
+  def visit_string_node(node)
+    m(node, :str, node.unescaped)
+  end
 end
