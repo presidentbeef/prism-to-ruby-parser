@@ -42,9 +42,38 @@ class PrismToRubyParserVisitor < Prism::Visitor
              :call
            end
 
-    m(node, type, visit(node.receiver), node.name) do |n|
+    call = m(node, type, visit(node.receiver), node.name) do |n|
       n.concat(visit(node.arguments)) if node.arguments
     end
+
+    if node.block
+      call_node_with_block(call, node)
+    else
+      call
+    end
+  end
+
+  # Helper for visit_call_node
+  def call_node_with_block(call, node)
+    m(node, :iter, call) do |n|
+      if node.block.parameters
+        n << visit(node.block.parameters)
+      end
+
+      n << visit(node.block)
+    end
+  end
+
+  def visit_block_node(node)
+    if node.body.nil?
+      [0] # RubyParser oddity
+    else
+      visit(node.body)
+    end
+  end
+
+  def visit_block_parameters_node(node)
+    visit(node.parameters)
   end
 
   def visit_arguments_node(node)
