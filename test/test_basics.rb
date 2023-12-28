@@ -49,4 +49,11 @@ class BasicTests < Minitest::Test
     assert_sexp('def x(a); end')
     assert_sexp('def x(a); b; end')
   end
+
+  def test_simple_ifs
+    assert_sexp('if x; end')
+    assert_sexp('if x; y; end')
+    assert_sexp('if x; y; z; end')
+    assert_sexp('if x; y else z end')
+  end
 end
