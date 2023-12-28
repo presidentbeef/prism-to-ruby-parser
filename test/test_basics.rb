@@ -26,4 +26,8 @@ class BasicTests < Minitest::Test
   def test_simple_string
     assert_sexp("'hello there'")
   end
+
+  def test_simple_symbol
+    assert_sexp(':abc1')
+  end
 end

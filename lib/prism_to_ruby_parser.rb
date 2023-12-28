@@ -54,4 +54,8 @@ class PrismToRubyParserVisitor < Prism::Visitor
   def visit_string_node(node)
     m(node, :str, node.unescaped)
   end
+
+  def visit_symbol_node(node)
+    m(node, :lit, node.unescaped.to_sym)
+  end
 end
