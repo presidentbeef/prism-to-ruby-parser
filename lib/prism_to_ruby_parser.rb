@@ -25,5 +25,9 @@ class PrismToRubyParserVisitor < Prism::Visitor
     end
   end
 
+  def visit_integer_node(node)
+    Sexp.new(:lit, node.value).tap do |n|
+      set_line(node, n)
+    end
   end
 end

@@ -6,4 +6,8 @@ class BasicTests < Minitest::Test
   def test_simple_call
     assert_sexp('x.y')
   end
+
+  def test_simple_integer
+    assert_sexp('1')
+  end
 end
