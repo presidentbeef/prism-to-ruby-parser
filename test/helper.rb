@@ -13,6 +13,9 @@ module ConversionTestHelper
 
   def prism_parse(src)
     output = Prism.parse(src)
+
+    assert output.errors.empty?, 'Errors parsing with Prism'
+
     PrismToRubyParserVisitor.new.visit(output.value)
   end
 
@@ -36,5 +39,11 @@ module ConversionTestHelper
         assert_equal e, from_prism[i]
       end
     end
+  end
+
+  def assert_parse(src, from_rp)
+    from_prism = prism_parse(src)
+
+    assert_same_sexp(from_rp, from_prism)
   end
 end

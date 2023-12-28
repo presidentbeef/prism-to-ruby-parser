@@ -7,7 +7,19 @@ class BasicTests < Minitest::Test
     assert_sexp('x.y')
   end
 
+  def test_call_with_arg
+    assert_sexp('x(1)')
+  end
+
+  def test_call_with_args
+    assert_sexp('x(1, 2)')
+  end
+
   def test_simple_integer
     assert_sexp('1')
+  end
+
+  def test_multiple_statements
+    assert_sexp("1\n2")
   end
 end

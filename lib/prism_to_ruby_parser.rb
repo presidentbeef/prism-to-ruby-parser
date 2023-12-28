@@ -15,20 +15,36 @@ class PrismToRubyParserVisitor < Prism::Visitor
     end
   end
 
-  def visit_program_node(node)
-    if node.statements.body.length > 1
+  def map_visit(node_array)
+    node_array.map { |n| visit(n) }
+  end
+
+  def visit_statements_node(node)
+    if node.body.length > 1
       m(node, :block) do |n|
-        n.concat(visit_all(node.statements))
+        n.concat(map_visit(node.body))
       end
     else
-      visit(node.statements.body.first)
+      # ruby_parser does not set a root Sexp
+      # when there is only one
+      visit(node.body.first)
     end
+  end
+
+  def visit_program_node(node)
+    visit(node.statements)
   end
 
   def visit_call_node(node)
     m(node, :call, visit(node.receiver), node.name) do |n|
-      n.concat(visit_all(node.arguments)) if node.arguments
+      n.concat(visit(node.arguments)) if node.arguments
     end
+  end
+
+  def visit_arguments_node(node)
+    # Return array of arguments - ruby_parser does not have a node type
+    # for method arguments
+    map_visit(node.arguments)
   end
 
   def visit_integer_node(node)
