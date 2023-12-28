@@ -36,7 +36,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_call_node(node)
-    type = if node.name.match? /\w\=$/
+    type = if node.name == :[]= or node.name.match? /\w\=$/
              :attrasgn
            else
              :call
@@ -79,5 +79,11 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   def visit_true_node(node)
     m(node, :true)
+  end
+
+  def visit_array_node(node)
+    m(node, :array) do |n|
+      n.concat(map_visit(node.elements))
+    end
   end
 end
