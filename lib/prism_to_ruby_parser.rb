@@ -36,7 +36,13 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_call_node(node)
-    m(node, :call, visit(node.receiver), node.name) do |n|
+    type = if node.name.match? /\w\=$/
+             :attrasgn
+           else
+             :call
+           end
+
+    m(node, type, visit(node.receiver), node.name) do |n|
       n.concat(visit(node.arguments)) if node.arguments
     end
   end
