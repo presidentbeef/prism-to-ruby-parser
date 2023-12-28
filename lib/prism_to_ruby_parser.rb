@@ -117,4 +117,32 @@ class PrismToRubyParserVisitor < Prism::Visitor
         m(node, :lvar, node.name),
         m(node, :lasgn, node.name, visit(node.value)))
   end
+
+  def visit_def_node(node)
+    args = if node.parameters
+             visit(node.parameters)
+           else
+             m(node, :args)
+           end
+
+    m(node, :defn, node.name, args) do |n|
+      if node.body
+        # body is a Statements node, but we don't want to wrap it in a :block
+        # so we're grabbing the Statements body directly
+        # HACK?
+        n.concat(map_visit(node.body.body))
+      else
+        n << m(node, :nil)
+      end
+    end
+  end
+
+  def visit_parameters_node(node)
+    # TODO: Add other types of parameters
+    m(node, :args, *map_visit(node.requireds))
+  end
+
+  def visit_required_parameter_node(node)
+    node.name
+  end
 end

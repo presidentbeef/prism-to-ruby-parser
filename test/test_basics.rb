@@ -43,4 +43,10 @@ class BasicTests < Minitest::Test
     assert_sexp('{}')
     assert_sexp('{ x: 1 }')
   end
+
+  def test_simple_defn
+    assert_sexp('def x; end')
+    assert_sexp('def x(a); end')
+    assert_sexp('def x(a); b; end')
+  end
 end
