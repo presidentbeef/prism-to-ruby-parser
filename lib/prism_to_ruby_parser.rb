@@ -98,10 +98,6 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :lit, node.value)
   end
 
-  def visit_string_node(node)
-    m(node, :str, node.unescaped)
-  end
-
   def visit_symbol_node(node)
     m(node, :lit, node.unescaped.to_sym)
   end
@@ -222,8 +218,25 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   # Strings
 
+  def visit_string_node(node)
+    m(node, :str, node.unescaped)
+  end
+
+  def visit_x_string_node(node)
+    m(node, :xstr, node.unescaped)
+  end
+
   def visit_interpolated_string_node(node)
-    m(node, :dstr) do |n|
+    type = case node
+           when Prism::InterpolatedStringNode
+             :dstr
+           when Prism::InterpolatedXStringNode
+             :dxstr
+           else
+             raise "Unexpected type: #{node.class}"
+           end
+
+    m(node, type) do |n|
       node.parts.each_with_index do |part, i|
         if i == 0 # only for first part of string
           if part.is_a? Prism::StringNode
@@ -239,6 +252,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
         n << visit(part)
       end
     end
+  end
+
+  def visit_interpolated_x_string_node(node)
+    visit_interpolated_string_node(node)
   end
 
   def visit_embedded_statements_node(node)

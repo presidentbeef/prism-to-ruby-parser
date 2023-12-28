@@ -103,10 +103,6 @@ class ParseTreeTestCase < Minitest::Test
                                   s(:args, :a, :@b),
                                   s(:lit, 42)))
 
-  add_18tests("not",
-              "Ruby"         => "(not true)",
-              "ParseTree"    => s(:not, s(:true)))
-
   add_18tests("str_question_control",
               "Ruby"         => '?\M-\C-a',
               "ParseTree"    => s(:lit, 129),
