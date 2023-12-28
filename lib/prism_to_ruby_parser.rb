@@ -9,7 +9,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   def m(p_node, type, *)
     Sexp.new(type, *).tap do |n|
-      yield if block_given?
+      yield n if block_given?
 
       set_line(p_node, n)
     end
