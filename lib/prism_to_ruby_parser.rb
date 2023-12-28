@@ -106,6 +106,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :lit, node.value)
   end
 
+  def visit_float_node(node)
+    m(node, :lit, node.value)
+  end
+
   def visit_symbol_node(node)
     m(node, :lit, node.unescaped.to_sym)
   end
