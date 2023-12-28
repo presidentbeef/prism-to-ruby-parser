@@ -68,4 +68,8 @@ class PrismToRubyParserVisitor < Prism::Visitor
   def visit_local_variable_write_node(node)
     m(node, :lasgn, node.name, visit(node.value))
   end
+
+  def visit_regular_expression_node(node)
+    m(node, :lit, Regexp.new(node.unescaped))
+  end
 end

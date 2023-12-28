@@ -34,4 +34,8 @@ class BasicTests < Minitest::Test
   def test_simple_assignment
     assert_sexp('x = 1')
   end
+
+  def test_simple_regex
+    assert_sexp('/\d/')
+  end
 end
