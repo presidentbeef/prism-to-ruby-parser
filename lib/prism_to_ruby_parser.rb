@@ -7,11 +7,18 @@ class PrismToRubyParserVisitor < Prism::Visitor
     new_sexp
   end
 
+  def m(p_node, type, *)
+    Sexp.new(type, *).tap do |n|
+      yield if block_given?
+
+      set_line(p_node, n)
+    end
+  end
+
   def visit_program_node(node)
     if node.statements.body.length > 1
-      Sexp.new(:block).tap do |n|
+      m(node, :block) do |n|
         n.concat(visit_all(node.statements))
-        set_line(node, n)
       end
     else
       visit(node.statements.body.first)
@@ -19,15 +26,12 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_call_node(node)
-    Sexp.new(:call, visit(node.receiver), node.name).tap do |n|
+    m(node, :call, visit(node.receiver), node.name) do |n|
       n.concat(visit_all(node.arguments)) if node.arguments
-      set_line(node, n)
     end
   end
 
   def visit_integer_node(node)
-    Sexp.new(:lit, node.value).tap do |n|
-      set_line(node, n)
-    end
+    m(node, :lit, node.value)
   end
 end
