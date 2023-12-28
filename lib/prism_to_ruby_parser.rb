@@ -19,15 +19,23 @@ class PrismToRubyParserVisitor < Prism::Visitor
     node_array.map { |n| visit(n) }
   end
 
-  def visit_statements_node(node)
+  def visit_statements_node(node, bare: false)
     if node.body.length > 1
-      m(node, :block) do |n|
-        n.concat(map_visit(node.body))
+      if bare
+        map_visit(node.body)
+      else
+        m(node, :block) do |n|
+          n.concat(map_visit(node.body))
+        end
       end
     else
-      # ruby_parser does not set a root Sexp
-      # when there is only one
-      visit(node.body.first)
+      if bare
+        [visit(node.body.first)]
+      else
+        # ruby_parser does not set a root Sexp
+        # when there is only one
+        visit(node.body.first)
+      end
     end
   end
 
@@ -244,6 +252,26 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   # Classes and such
+
+  def visit_class_node(node)
+    m(node, :class, node.constant_path.name) do |n|
+      if node.superclass
+        if node.superclass.is_a? Prism::ConstantReadNode
+          n << node.superclass.name
+        else
+          n << visit(node)
+        end
+      else
+        # RP uses nil for no superclass
+        n << nil
+      end
+
+      if node.body
+        # Do _not_ wrap in :block
+        n.concat visit_statements_node(node.body, bare: true)
+      end
+    end
+  end
 
   def visit_instance_variable_read_node(node)
     m(node, :ivar, node.name)

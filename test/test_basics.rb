@@ -67,4 +67,18 @@ class BasicTests < Minitest::Test
     assert_sexp('"1#{2}3#{4}"')
     assert_sexp('"1#{2; 3}4"')
   end
+
+  def test_simple_command
+    assert_sexp('`hello`')
+  end
+
+  def test_command_interpolation
+    assert_sexp('`a#{1}b`')
+  end
+
+  def test_simple_class
+    assert_sexp('class A; end')
+    assert_sexp('class A; x; end')
+    assert_sexp('class A; x; y; end')
+  end
 end
