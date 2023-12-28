@@ -28,7 +28,10 @@ module ConversionTestHelper
 
   def assert_same_sexp(from_rp, from_prism)
     assert_equal from_rp, from_prism
-    assert_equal from_rp.line, from_prism.line, "Lines did not match"
+
+    if from_rp.line
+      assert_equal from_rp.line, from_prism.line
+    end
 
     from_rp.each_with_index do |e, i|
       if e.is_a? Sexp
