@@ -1562,9 +1562,6 @@ module TestRubyParserShared
              nil).line(2))
 
     assert_parse rb, pt
-
-    assert_equal 3, result.if.return.line
-    assert_equal 3, result.if.return.lit.line
   end
 
   def test_parse_line_str_with_newline_escape

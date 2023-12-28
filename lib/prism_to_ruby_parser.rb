@@ -189,6 +189,14 @@ class PrismToRubyParserVisitor < Prism::Visitor
     node.name
   end
 
+  def visit_return_node(node)
+    m(node, :return) do |n|
+      if node.arguments
+        n.concat(visit(node.arguments))
+      end
+    end
+  end
+
   # Conditionals
 
   def visit_if_node(node)
