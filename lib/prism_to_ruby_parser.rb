@@ -36,7 +36,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_call_node(node)
-    type = if node.name == :[]= or node.name.match? /\w\=$/
+    type = if node.name == :[]= or node.name.match?(/\w\=$/)
              :attrasgn
            else
              :call
@@ -202,5 +202,32 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   def visit_else_node(node)
     visit(node.statements)
+  end
+
+  # Strings
+
+  def visit_interpolated_string_node(node)
+    m(node, :dstr) do |n|
+      node.parts.each_with_index do |part, i|
+        if i == 0 # only for first part of string
+          if part.is_a? Prism::StringNode
+            n << part.unescaped
+            next
+          else
+            # RP explicitly uses a bare empty string
+            # if the first value is not a string
+            n << ''
+          end
+        end
+
+        n << visit(part)
+      end
+    end
+  end
+
+  def visit_embedded_statements_node(node)
+    m(node, :evstr) do |n|
+      n << visit(node.statements)
+    end
   end
 end

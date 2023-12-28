@@ -56,4 +56,15 @@ class BasicTests < Minitest::Test
     assert_sexp('if x; y; z; end')
     assert_sexp('if x; y else z end')
   end
+
+  def test_simple_interpolation
+    assert_sexp('"#{1}"')
+    assert_sexp('"1#{2}"')
+    assert_sexp('"1#{2}3"')
+  end
+
+  def test_less_simple_interpolation
+    assert_sexp('"1#{2}3#{4}"')
+    assert_sexp('"1#{2; 3}4"')
+  end
 end
