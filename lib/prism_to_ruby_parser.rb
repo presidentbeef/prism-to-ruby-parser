@@ -17,6 +17,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     end
   end
 
+  # Create a new Sexp and concat the last argument to it.
+  #
+  # This is generally better than splatting the last argument,
+  # especially if the last argument is long.
   def m_c(p_node, type, *, concat_arg)
     m(p_node, type, *) do |n|
       if concat_arg # might be nil
