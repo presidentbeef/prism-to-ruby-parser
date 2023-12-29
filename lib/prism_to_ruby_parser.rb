@@ -441,6 +441,16 @@ class PrismToRubyParserVisitor < Prism::Visitor
     end
   end
 
+  def visit_module_node(node)
+    name = if node.constant_path.is_a? Prism::ConstantReadNode
+             node.constant_path.name
+           else
+             visit(node.constant_path)
+           end
+
+    m_c(node, :module, name, visit_statements_node(node.body, bare: true))
+  end
+
   def visit_instance_variable_read_node(node)
     m(node, :ivar, node.name)
   end
