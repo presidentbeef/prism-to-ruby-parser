@@ -374,11 +374,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
   def visit_class_node(node)
     m(node, :class, node.constant_path.name) do |n|
       if node.superclass
-        if node.superclass.is_a? Prism::ConstantReadNode
-          n << node.superclass.name
-        else
-          n << visit(node)
-        end
+        n << visit(node.superclass)
       else
         # RP uses nil for no superclass
         n << nil
