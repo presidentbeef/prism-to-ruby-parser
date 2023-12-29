@@ -89,14 +89,20 @@ class PrismToRubyParserVisitor < Prism::Visitor
     call = m_c(node, type, visit(node.receiver), node.name, visit(node.arguments))
 
     if node.block
-      call_node_with_block(call, node)
+      if node.block.is_a? Prism::BlockNode
+        call_node_with_block(call, node)
+      else
+        call << visit(node.block)
+      end
     else
       call
     end
   end
 
   def visit_super_node(node)
-    m_c(node, :super, visit(node.arguments))
+    m_c(node, :super, visit(node.arguments)).tap do |n|
+      n << visit(node.block) if node.block
+    end
   end
 
   def visit_forwarding_super_node(node)
@@ -136,6 +142,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   def visit_block_parameters_node(node)
     visit(node.parameters)
+  end
+
+  def visit_block_argument_node(node)
+    m(node, :block_pass, visit(node.expression))
   end
 
   def visit_arguments_node(node)
