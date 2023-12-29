@@ -195,6 +195,29 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :lit, node.unescaped.to_sym)
   end
 
+  def visit_range_node(node)
+    left = node.left && visit(node.left)
+    right = node.right && visit(node.right)
+
+    # RP will convert range nodes with integers _on both ends_
+    # to a literal range
+    # Copying logic straight from RP
+    if left and right and left.sexp_type == :lit and right.sexp_type == :lit and Integer === left.last and Integer === right.last
+
+      if node.exclude_end?
+        m(node, :lit, (left.last...right.last))
+      else
+        m(node, :lit, (left.last..right.last))
+      end
+    else
+      if node.exclude_end?
+        m(node, :dot3, left, right)
+      else
+        m(node, :dot2, left, right)
+      end
+    end
+  end
+
   def visit_local_variable_read_node(node)
     m(node, :lvar, node.name)
   end
