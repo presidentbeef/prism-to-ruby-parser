@@ -388,4 +388,12 @@ class PrismToRubyParserVisitor < Prism::Visitor
         m(node, :ivar, node.name),
         m(node, :iasgn, node.name, visit(node.value)))
   end
+
+  def visit_class_variable_read_node(node)
+    m(node, :cvar, node.name)
+  end
+
+  def visit_class_variable_write_node(node)
+    m(node, :cvdecl, node.name, visit(node.value))
+  end
 end
