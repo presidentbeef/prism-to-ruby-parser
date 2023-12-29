@@ -242,6 +242,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :true)
   end
 
+  def visit_nil_node(node)
+    m(node, :nil)
+  end
+
   def visit_array_node(node)
     m_c(node, :array, map_visit(node.elements))
   end
