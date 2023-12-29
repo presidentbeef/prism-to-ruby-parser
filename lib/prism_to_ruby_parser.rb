@@ -281,6 +281,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m_c(node, :yield, visit(node.arguments))
   end
 
+  def visit_redo_node(node)
+    m(node, :redo)
+  end
+
   # Conditionals
 
   def visit_if_node(node)
