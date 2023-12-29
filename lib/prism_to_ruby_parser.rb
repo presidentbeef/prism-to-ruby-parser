@@ -97,18 +97,18 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :iter, call) do |n|
       if node.block.parameters
         n << visit(node.block.parameters)
+      else
+        n << 0 # ?? RP oddity indicating no block parameters
       end
 
-      n << visit(node.block)
+      if node.block.body
+        n << visit(node.block)
+      end
     end
   end
 
   def visit_block_node(node)
-    if node.body.nil?
-      [0] # RubyParser oddity
-    else
-      visit(node.body)
-    end
+    visit(node.body)
   end
 
   def visit_block_parameters_node(node)

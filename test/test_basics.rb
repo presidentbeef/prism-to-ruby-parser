@@ -15,6 +15,19 @@ class BasicTests < Minitest::Test
     assert_sexp('x(1, 2)')
   end
 
+  def test_call_with_block
+    assert_sexp('x do; end')
+  end
+
+  def test_call_with_block_simple_args
+    assert_sexp('x do |y| end')
+  end
+
+  def test_call_with_block_body
+    assert_sexp('x do; 1; end')
+    assert_sexp('x do; 1; 2; end')
+  end
+
   def test_simple_integer
     assert_sexp('1')
   end
