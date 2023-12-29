@@ -29,6 +29,21 @@ class PrismToRubyParserVisitor < Prism::Visitor
     end
   end
 
+  def m_with_splat_args(node, type, node_args)
+    m(node, type) do |n|
+      if node_args
+        args = visit(node_args)
+
+        if args.any? { |a| a.sexp_type == :splat }
+          n << m_c(node, :svalue, args)
+        else
+          n.concat args
+        end
+      end
+    end
+
+  end
+
   def map_visit(node_array)
     node_array.map { |n| visit(n) }
   end
@@ -264,17 +279,11 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_break_node(node)
-    m(node, :break) do |n|
-      if node.arguments
-        args = visit(node.arguments)
+    m_with_splat_args(node, :break, node.arguments)
+  end
 
-        if args.any? { |a| a.sexp_type == :splat }
-          n << m_c(node, :svalue, args)
-        else
-          n.concat args
-        end
-      end
-    end
+  def visit_next_node(node)
+    m_with_splat_args(node, :next, node.arguments)
   end
 
   def visit_yield_node(node)
