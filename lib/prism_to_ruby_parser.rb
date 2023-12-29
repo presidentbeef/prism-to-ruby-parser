@@ -384,6 +384,15 @@ class PrismToRubyParserVisitor < Prism::Visitor
     visit(node.statements)
   end
 
+  def visit_unless_node(node)
+    condition = visit(node.predicate)
+
+    then_clause = visit(node.statements)
+    else_clause = visit(node.consequent)
+
+    m(node, :if, condition, else_clause, then_clause)
+  end
+
   # Strings
 
   def visit_string_node(node)
