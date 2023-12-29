@@ -231,7 +231,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     # TODO: Add other types of parameters
     m(node, :args) do |n|
       n.concat map_visit(node.requireds) # Regular arguments
+      n.concat map_visit(node.optionals) # Regular optional arguments?
       n.concat map_visit(node.keywords)  # Keyword arguments
+      n << visit(node.rest) if node.rest # The rest
+      n << visit(node.keyword_rest) if node.keyword_rest
       n.concat map_visit(node.posts)     # Regular arguments, but later?
     end
   end
@@ -240,12 +243,20 @@ class PrismToRubyParserVisitor < Prism::Visitor
     node.name
   end
 
+  def visit_rest_parameter_node(node)
+    :"*#{node.name}" # RP oddity
+  end
+
   def visit_required_keyword_parameter_node(node)
     m(node, :kwarg, node.name)
   end
 
   def visit_optional_keyword_parameter_node(node)
     m(node, :kwarg, node.name, visit(node.value))
+  end
+
+  def visit_keyword_rest_parameter_node(node)
+    :"**#{node.name}" # RP oddity
   end
 
   def visit_return_node(node)
