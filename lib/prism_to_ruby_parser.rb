@@ -281,6 +281,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     node.name
   end
 
+  def visit_optional_parameter_node(node)
+    m(node, :lasgn, node.name, visit(node.value))
+  end
+
   def visit_rest_parameter_node(node)
     :"*#{node.name}" # RP oddity
   end
