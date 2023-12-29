@@ -63,6 +63,11 @@ class BasicTests < Minitest::Test
     assert_sexp('def x(a); b; end')
   end
 
+  def test_defn_kwargs
+    assert_sexp('def x(y: 1); end')
+    assert_sexp('def x(y:); end')
+  end
+
   def test_simple_ifs
     assert_sexp('if x; end')
     assert_sexp('if x; y; end')
