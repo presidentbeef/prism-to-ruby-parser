@@ -1,6 +1,8 @@
 require 'prism'
 
 class PrismToRubyParserVisitor < Prism::Visitor
+  # Helper functions
+
   def set_line(p_node, new_sexp)
     new_sexp.line = p_node.location.start_line
     new_sexp.max_line = p_node.location.end_line
@@ -52,6 +54,12 @@ class PrismToRubyParserVisitor < Prism::Visitor
     node_array.map { |n| visit(n) }
   end
 
+  # Structure nodes
+
+  def visit_program_node(node)
+    visit(node.statements)
+  end
+
   def visit_statements_node(node, bare: false)
     if node.body.length > 1
       if bare
@@ -72,8 +80,8 @@ class PrismToRubyParserVisitor < Prism::Visitor
     end
   end
 
-  def visit_program_node(node)
-    visit(node.statements)
+  def visit_parentheses_node(node)
+    visit(node.body)
   end
 
   # Calls and attribute assignments
