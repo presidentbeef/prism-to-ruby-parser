@@ -10,6 +10,8 @@ class PrismToRubyParserVisitor < Prism::Visitor
   # Create Sexp with given type, set line based
   # on Prism node, and append the rest of the arguments
   def m(p_node, type, *)
+    raise 'Pass Prism node as first argument' unless p_node.is_a? Prism::Node
+
     Sexp.new(type, *).tap do |n|
       yield n if block_given?
 
@@ -22,6 +24,8 @@ class PrismToRubyParserVisitor < Prism::Visitor
   # This is generally better than splatting the last argument,
   # especially if the last argument is long.
   def m_c(p_node, type, *, concat_arg)
+    raise 'Pass Prism node as first argument' unless p_node.is_a? Prism::Node
+
     m(p_node, type, *) do |n|
       if concat_arg # might be nil
         n.concat(concat_arg)
