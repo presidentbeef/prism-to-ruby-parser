@@ -345,11 +345,13 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_return_node(node)
-    if node.arguments.arguments.length > 1
+    if node.arguments.nil?
+      m(node, :return)
+    elsif node.arguments.arguments.length > 1
       args = m_c(node, :array, visit(node.arguments))
       m(node, :return, args)
     else
-      m_c(node, :return, visit(node.arguments))
+      m_with_splat_args(node, :return, node.arguments)
     end
   end
 
