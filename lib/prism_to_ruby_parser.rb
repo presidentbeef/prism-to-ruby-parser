@@ -148,6 +148,24 @@ class PrismToRubyParserVisitor < Prism::Visitor
     end
   end
 
+  def visit_lambda_node(node)
+    m(node, :iter, m(node, :lambda)) do |n|
+      if node.parameters
+        if node.parameters.parameters.nil?
+          n << m(node.parameters, :args)
+        else
+          n << visit(node.parameters)
+        end
+      else
+        n << 0
+      end
+
+      if node.body
+        n << visit(node.body)
+      end
+    end
+  end
+
   def visit_block_node(node)
     visit(node.body)
   end
@@ -326,6 +344,11 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   def visit_rest_parameter_node(node)
     :"*#{node.name}" # RP oddity
+  end
+
+  # lambda { |a, | }
+  def visit_implicit_rest_node(node)
+    nil # This is how RP does it
   end
 
   def visit_required_keyword_parameter_node(node)
