@@ -118,54 +118,6 @@ class ParseTreeTestCase < Minitest::Test
               "ParseTree"    => s(:lit, 97),
               "Ruby2Ruby"    => "97")
 
-  add_18tests("unless_post_not",
-              "Ruby"         => "a unless not b",
-              "ParseTree"    => s(:if, s(:call, nil, :b),
-                                  s(:call, nil, :a), nil),
-              "Ruby2Ruby"    => "a if b")
-
-  add_18tests("unless_pre_not",
-              "Ruby"         => "unless not b then a end",
-              "ParseTree"    => s(:if, s(:call, nil, :b),
-                                  s(:call, nil, :a), nil),
-              "Ruby2Ruby"    => "a if b")
-
-  add_18tests("until_post_not",
-              "Ruby"         => "begin\n  (1 + 1)\nend until not true",
-              "ParseTree"    => s(:while, s(:true),
-                                  s(:call, s(:lit, 1), :+, s(:lit, 1)), false),
-              "Ruby2Ruby"    => "begin\n  (1 + 1)\nend while true")
-
-  add_18tests("until_pre_not",
-              "Ruby"         => "until not true do\n  (1 + 1)\nend",
-              "ParseTree"    => s(:while, s(:true),
-                                  s(:call, s(:lit, 1), :+, s(:lit, 1)), true),
-              "Ruby2Ruby"    => "while true do\n  (1 + 1)\nend")
-
-  add_18tests("until_pre_not_mod",
-              "Ruby"         => "(1 + 1) until not true",
-              "ParseTree"    => s(:while, s(:true),
-                                  s(:call, s(:lit, 1), :+, s(:lit, 1)), true),
-              "Ruby2Ruby"    => "while true do\n  (1 + 1)\nend")
-
-  add_18tests("while_post_not",
-              "Ruby"         => "begin\n  (1 + 1)\nend while not true",
-              "ParseTree"    => s(:until, s(:true),
-                                  s(:call, s(:lit, 1), :+, s(:lit, 1)), false),
-              "Ruby2Ruby"    => "begin\n  (1 + 1)\nend until true")
-
-  add_18tests("while_pre_not",
-              "Ruby"         => "while not true do\n  (1 + 1)\nend",
-              "ParseTree"    => s(:until, s(:true),
-                                  s(:call, s(:lit, 1), :+, s(:lit, 1)), true),
-              "Ruby2Ruby"    => "until true do\n  (1 + 1)\nend")
-
-  add_18tests("while_pre_not_mod",
-              "Ruby"         => "(1 + 1) while not true",
-              "ParseTree"    => s(:until, s(:true),
-                                  s(:call, s(:lit, 1), :+, s(:lit, 1)), true),
-              "Ruby2Ruby"    => "until true do\n  (1 + 1)\nend") # FIX
-
   ###
   # 1.9 specific tests
 
