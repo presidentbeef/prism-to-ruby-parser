@@ -268,6 +268,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
       n.concat map_visit(node.keywords)  # Keyword arguments
       n << visit(node.rest) if node.rest # The rest
       n << visit(node.keyword_rest) if node.keyword_rest
+      n << visit(node.block) if node.block # Block argument
       n.concat map_visit(node.posts)     # Regular arguments, but later?
     end
   end
@@ -290,6 +291,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   def visit_keyword_rest_parameter_node(node)
     :"**#{node.name}" # RP oddity
+  end
+
+  def visit_block_parameter_node(node)
+    :"&#{node.name}"
   end
 
   def visit_return_node(node)
