@@ -95,6 +95,14 @@ class PrismToRubyParserVisitor < Prism::Visitor
     end
   end
 
+  def visit_super_node(node)
+    m_c(node, :super, visit(node.arguments))
+  end
+
+  def visit_forwarding_super_node(node)
+    m(node, :zsuper)
+  end
+
   # E.g. `a[1] += 1`
   def visit_index_operator_write_node(node)
     arglist = m_c(node.arguments, :arglist, visit(node.arguments))
