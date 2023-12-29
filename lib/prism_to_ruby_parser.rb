@@ -263,6 +263,19 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m_c(node, :return, visit(node.arguments))
   end
 
+  def visit_break_node(node)
+    m(node, :break) do |n|
+      if node.arguments
+        args = visit(node.arguments)
+
+        if args.any? { |a| a.sexp_type == :splat }
+          n << m_c(node, :svalue, args)
+        else
+          n.concat args
+        end
+      end
+    end
+  end
   # Conditionals
 
   def visit_if_node(node)
