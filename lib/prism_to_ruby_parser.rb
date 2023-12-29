@@ -57,6 +57,8 @@ class PrismToRubyParserVisitor < Prism::Visitor
     visit(node.statements)
   end
 
+  # Calls and attribute assignments
+
   def visit_call_node(node)
     type = case
            when node.attribute_write? && node.safe_navigation?
@@ -76,6 +78,18 @@ class PrismToRubyParserVisitor < Prism::Visitor
     else
       call
     end
+  end
+
+  # E.g. `a[1] += 1`
+  def visit_index_operator_write_node(node)
+    arglist = m_c(node.arguments, :arglist, visit(node.arguments))
+
+    m(node,
+      :op_asgn1,
+      visit(node.receiver),
+      arglist,
+      node.operator,
+      visit(node.value))
   end
 
   # Helper for visit_call_node

@@ -87,4 +87,8 @@ class BasicTests < Minitest::Test
     assert_sexp('::X')
     assert_sexp('X::Y')
   end
+
+  def test_op_asgn1
+    assert_sexp('a[1] &= 2')
+  end
 end
