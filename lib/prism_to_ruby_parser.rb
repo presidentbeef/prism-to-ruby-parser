@@ -526,4 +526,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
   def visit_class_variable_write_node(node)
     m(node, :cvdecl, node.name, visit(node.value))
   end
+
+  # Miscellaneous
+
+  def visit_defined_node(node)
+    m(node, :defined, visit(node.value))
+  end
 end
