@@ -664,6 +664,12 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :cdecl, visit(node))
   end
 
+  def visit_call_target_node(node)
+    m(node, :attrasgn, visit(node.receiver), node.name)
+  end
+
+  # Logical
+
   def visit_or_node(node)
     m(node, :or, visit(node.left), visit(node.right))
   end
