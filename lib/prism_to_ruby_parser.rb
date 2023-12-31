@@ -589,8 +589,79 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :defined, visit(node.value))
   end
 
+  # @source="x,y = 1,2"
+  # @value=
+  #  @ ProgramNode (location: (1,0)-(1,9))
+  #  ├── locals: [:x, :y]
+  #  └── statements:
+  #      @ StatementsNode (location: (1,0)-(1,9))
+  #      └── body: (length: 1)
+  #          └── @ MultiWriteNode (location: (1,0)-(1,9))
+  #              ├── lefts: (length: 2)
+  #              │   ├── @ LocalVariableTargetNode (location: (1,0)-(1,1))
+  #              │   │   ├── name: :x
+  #              │   │   └── depth: 0
+  #              │   └── @ LocalVariableTargetNode (location: (1,2)-(1,3))
+  #              │       ├── name: :y
+  #              │       └── depth: 0
+  #              ├── rest: ∅
+  #              ├── rights: (length: 0)
+  #              ├── lparen_loc: ∅
+  #              ├── rparen_loc: ∅
+  #              ├── operator_loc: (1,4)-(1,5) = "="
+  #              └── value:
+  #                  @ ArrayNode (location: (1,6)-(1,9))
+  #                  ├── flags: ∅
+  #                  ├── elements: (length: 2)
+  #                  │   ├── @ IntegerNode (location: (1,6)-(1,7))
+  #                  │   │   └── flags: decimal
+  #                  │   └── @ IntegerNode (location: (1,8)-(1,9))
+  #                  │       └── flags: decimal
+  #                  ├── opening_loc: ∅
+  #                  └── closing_loc: ∅,
+  def visit_multi_write_node(node)
+    left = m_c(node, :array, map_visit(node.lefts))
+
+    # x, *y = 1, 2
+    # but not
+    # x, = 1, 2
+    # RP does nothing for the latter
+    if node.rest and not node.rest.is_a? Prism::ImplicitRestNode
+      left << visit(node.rest)
+    end
+
+    right = case node.value
+            when Prism::ArrayNode
+              if node.value.elements.length == 1 and node.value.elements.first.is_a? Prism::SplatNode
+                # x, y = *a
+                # RP does not wrap the values in an array, but Prism always does
+                visit(node.value.elements.first)
+              else
+                visit(node.value)
+              end
+            when Prism::SplatNode
+              visit(node.value)
+            else
+              m(node, :to_ary, visit(node.value))
+            end
+
+    m(node, :masgn, left, right)
+  end
+
   def visit_local_variable_target_node(node)
     m(node, :lasgn, node.name)
+  end
+
+  def visit_instance_variable_target_node(node)
+    m(node, :iasgn, node.name)
+  end
+
+  def visit_constant_target_node(node)
+    m(node, :cdecl, node.name)
+  end
+
+  def visit_constant_path_target_node(node)
+    m(node, :cdecl, visit(node))
   end
 
   def visit_or_node(node)
