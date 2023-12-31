@@ -325,7 +325,14 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_splat_node(node)
-    m(node, :splat, visit(node.expression))
+    if node.expression
+      m(node, :splat, visit(node.expression))
+    else
+      # Sometimes there are bare splats, like in
+      # parallel assignment:
+      # x, * = 1, 2, 3
+      m(node, :splat)
+    end
   end
 
   # a.y ||= foo
