@@ -573,4 +573,16 @@ class PrismToRubyParserVisitor < Prism::Visitor
   def visit_defined_node(node)
     m(node, :defined, visit(node.value))
   end
+
+  def visit_local_variable_target_node(node)
+    m(node, :lasgn, node.name)
+  end
+
+  def visit_or_node(node)
+    m(node, :or, visit(node.left), visit(node.right))
+  end
+
+  def visit_and_node(node)
+    m(node, :and, visit(node.left), visit(node.right))
+  end
 end
