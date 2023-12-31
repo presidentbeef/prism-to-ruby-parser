@@ -133,6 +133,47 @@ class PrismToRubyParserVisitor < Prism::Visitor
       visit(node.value))
   end
 
+=begin
+ @source="x[1] ||= 1"
+ @value=
+  @ ProgramNode (location: (1,0)-(1,10))
+  ├── locals: []
+  └── statements:
+      @ StatementsNode (location: (1,0)-(1,10))
+      └── body: (length: 1)
+          └── @ IndexOrWriteNode (location: (1,0)-(1,10))
+              ├── flags: ∅
+              ├── receiver:
+              │   @ CallNode (location: (1,0)-(1,1))
+              │   ├── flags: variable_call
+              │   ├── receiver: ∅
+              │   ├── call_operator_loc: ∅
+              │   ├── name: :x
+              │   ├── message_loc: (1,0)-(1,1) = "x"
+              │   ├── opening_loc: ∅
+              │   ├── arguments: ∅
+              │   ├── closing_loc: ∅
+              │   └── block: ∅
+              ├── call_operator_loc: ∅
+              ├── opening_loc: (1,1)-(1,2) = "["
+              ├── arguments:
+              │   @ ArgumentsNode (location: (1,2)-(1,3))
+              │   ├── flags: ∅
+              │   └── arguments: (length: 1)
+              │       └── @ IntegerNode (location: (1,2)-(1,3))
+              │           └── flags: decimal
+              ├── closing_loc: (1,3)-(1,4) = "]"
+              ├── block: ∅
+              ├── operator_loc: (1,5)-(1,8) = "||="
+              └── value:
+                  @ IntegerNode (location: (1,9)-(1,10))
+                  └── flags: decimal,
+=end
+  def visit_index_or_write_node(node)
+    bracket_args = m_c(node, :arglist, visit(node.arguments))
+    m(node, :op_asgn1, visit(node.receiver), bracket_args, :'||', visit(node.value))
+  end
+
   # Helper for visit_call_node
   def call_node_with_block(call, node)
     m(node, :iter, call) do |n|
