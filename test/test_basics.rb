@@ -116,4 +116,13 @@ class BasicTests < Minitest::Test
   def test_op_asgn1
     assert_sexp('a[1] &= 2')
   end
+
+  def test_bracket_attribute_assign
+    assert_sexp('a[1] ||= 2')
+  end
+
+  def test_constant_assign
+    assert_sexp('A = 1')
+    assert_sexp('A::B = 1')
+  end
 end

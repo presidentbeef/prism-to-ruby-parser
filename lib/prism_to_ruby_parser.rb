@@ -233,6 +233,14 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :const, node.name)
   end
 
+  def visit_constant_write_node(node)
+    m(node, :cdecl, node.name, visit(node.value))
+  end
+
+  def visit_constant_path_write_node(node)
+    m(node, :cdecl, visit(node.target), visit(node.value))
+  end
+
   def visit_constant_path_node(node)
     if node.parent.nil?
       # ::X
