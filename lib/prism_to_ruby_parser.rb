@@ -81,7 +81,12 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_parentheses_node(node)
-    visit(node.body)
+    if node.body
+      visit(node.body)
+    else
+      # ()
+      m(node, :nil)
+    end
   end
 
   # Calls and attribute assignments
