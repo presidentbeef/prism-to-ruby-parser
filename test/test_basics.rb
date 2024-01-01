@@ -125,4 +125,8 @@ class BasicTests < Minitest::Test
     assert_sexp('A = 1')
     assert_sexp('A::B = 1')
   end
+
+  def test_simple_defs
+    assert_sexp('def self.x; end')
+  end
 end

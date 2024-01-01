@@ -373,13 +373,19 @@ class PrismToRubyParserVisitor < Prism::Visitor
              m(node, :args)
            end
 
-    m(node, :defn, node.name, args) do |n|
-      if node.body
-        n.concat(visit_statements_node(node.body, bare: true))
-      else
-        n << m(node, :nil)
-      end
+    result = if node.receiver
+               m(node, :defs, visit(node.receiver), node.name, args)
+             else
+               m(node, :defn, node.name, args)
+             end
+
+    if node.body
+      result.concat(visit_statements_node(node.body, bare: true))
+    else
+      result << m(node, :nil)
     end
+
+    result
   end
 
   def visit_parameters_node(node)
