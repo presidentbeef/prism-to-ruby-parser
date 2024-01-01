@@ -395,8 +395,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_parameters_node(node)
-    # TODO: Add other types of parameters
+    # TODO: Add other types of parameters?
     m(node, :args) do |n|
+      @in_parameters = true # Ugh HACK because :masgns are different in parameters
+
       n.concat map_visit(node.requireds) # Regular arguments
       n.concat map_visit(node.optionals) # Regular optional arguments?
       n.concat map_visit(node.keywords)  # Keyword arguments
@@ -404,6 +406,8 @@ class PrismToRubyParserVisitor < Prism::Visitor
       n << visit(node.keyword_rest) if node.keyword_rest
       n << visit(node.block) if node.block # Block argument
       n.concat map_visit(node.posts)     # Regular arguments, but later?
+
+      @in_parameters = false
     end
   end
 
@@ -647,6 +651,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
       left << visit(node.rest)
     end
 
+    if node.rights
+      left.concat map_visit(node.rights)
+    end
+
     right = case node.value
             when Prism::ArrayNode
               if node.value.elements.length == 1 and node.value.elements.first.is_a? Prism::SplatNode
@@ -692,7 +700,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   # A::B, C::D = 1, 2
   def visit_constant_path_target_node(node)
-    m(node, :cdecl, visit(node))
+    m(node, :const, visit_constant_path_node(node))
   end
 
   # a.b, c.d = 1, 2
@@ -706,7 +714,13 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_multi_target_node(node)
-    m(node, :masgn, m_c(node, :array, map_visit(node.lefts)))
+    if @in_parameters
+      # When there is an masgn inside a block parameter list,
+      # the variables are not wrapped in an array
+      m_c(node, :masgn, map_visit(node.lefts))
+    else
+      m(node, :masgn, m_c(node, :array, map_visit(node.lefts)))
+    end
   end
 
   # Logical
