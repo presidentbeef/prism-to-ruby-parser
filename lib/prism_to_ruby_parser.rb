@@ -636,6 +636,16 @@ class PrismToRubyParserVisitor < Prism::Visitor
                 # x, y = *a
                 # RP does not wrap the values in an array, but Prism always does
                 visit(node.value.elements.first)
+              elsif node.value.opening_loc
+                # Bit of HACK
+                # Prism does not differentiate between
+                #   a, b = 1, 2
+                # and
+                #   a, b = [1, 2]
+                # But RP will wrap the array literal with :to_aray
+                # So one way to tell the difference is to check for location of `[`
+                # in the Prism result
+                m(node.value, :to_ary, visit(node.value))
               else
                 visit(node.value)
               end
@@ -673,8 +683,13 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :attrasgn, visit(node.receiver), node.name)
   end
 
+  # a[i], b[j] = b[j], a[i]
   def visit_index_target_node(node)
     m_c(node, :attrasgn, visit(node.receiver), :[]=, visit(node.arguments))
+  end
+
+  def visit_multi_target_node(node)
+    m(node, :masgn, m_c(node, :array, map_visit(node.lefts)))
   end
 
   # Logical
