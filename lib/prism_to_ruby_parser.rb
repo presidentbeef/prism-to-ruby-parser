@@ -271,6 +271,16 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :lit, node.unescaped.to_sym)
   end
 
+  def visit_regular_expression_node(node)
+    flags = 0
+
+    flags |= Regexp::MULTILINE if node.multi_line?
+    flags |= Regexp::IGNORECASE if node.ignore_case?
+    flags |= Regexp::EXTENDED if node.extended?
+
+    m(node, :lit, Regexp.new(node.unescaped, flags))
+  end
+
   def visit_range_node(node)
     left = node.left && visit(node.left)
     right = node.right && visit(node.right)
@@ -300,10 +310,6 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   def visit_local_variable_write_node(node)
     m(node, :lasgn, node.name, visit(node.value))
-  end
-
-  def visit_regular_expression_node(node)
-    m(node, :lit, Regexp.new(node.unescaped))
   end
 
   def visit_false_node(node)
