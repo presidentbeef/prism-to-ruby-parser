@@ -648,24 +648,33 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :masgn, left, right)
   end
 
+  # x, y = 1, 2
   def visit_local_variable_target_node(node)
     m(node, :lasgn, node.name)
   end
 
+  # @x, @y = 1, 2
   def visit_instance_variable_target_node(node)
     m(node, :iasgn, node.name)
   end
 
+  # A, B = 1, 2
   def visit_constant_target_node(node)
     m(node, :cdecl, node.name)
   end
 
+  # A::B, C::D = 1, 2
   def visit_constant_path_target_node(node)
     m(node, :cdecl, visit(node))
   end
 
+  # a.b, c.d = 1, 2
   def visit_call_target_node(node)
     m(node, :attrasgn, visit(node.receiver), node.name)
+  end
+
+  def visit_index_target_node(node)
+    m_c(node, :attrasgn, visit(node.receiver), :[]=, visit(node.arguments))
   end
 
   # Logical
