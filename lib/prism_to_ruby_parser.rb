@@ -179,6 +179,11 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :op_asgn1, visit(node.receiver), bracket_args, :'||', visit(node.value))
   end
 
+  # x.y += 1
+  def visit_call_operator_write_node(node)
+    m(node, :op_asgn2, visit(node.receiver), node.write_name, node.operator, visit(node.value))
+  end
+
   # Helper for visit_call_node
   def call_node_with_block(call, node)
     m(node, :iter, call) do |n|
