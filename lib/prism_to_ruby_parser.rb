@@ -361,7 +361,12 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   # a.y ||= foo
   def visit_call_or_write_node(node)
-    m(node, :op_asgn, visit(node.receiver), visit(node.value), node.read_name, :'||')
+    # TODO: Why are these so different? RP bug?
+    if node.safe_navigation? # a&.y ||= foo
+      m(node, :safe_op_asgn2, visit(node.receiver), node.write_name, :'||', visit(node.value))
+    else
+      m(node, :op_asgn, visit(node.receiver), visit(node.value), node.read_name, :'||')
+    end
   end
 
   # a ||= foo
