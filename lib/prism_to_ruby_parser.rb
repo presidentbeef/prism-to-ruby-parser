@@ -336,7 +336,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
   def visit_hash_node(node)
     m(node, :hash) do |n|
       pairs = node.elements.flat_map do |e|
-        [visit(e.key), visit(e.value)]
+        visit(e)
       end
 
       n.concat pairs
@@ -356,6 +356,14 @@ class PrismToRubyParserVisitor < Prism::Visitor
       # parallel assignment:
       # x, * = 1, 2, 3
       m(node, :splat)
+    end
+  end
+
+  def visit_assoc_splat_node(node)
+    if node.value
+      [m(node, :kwsplat, visit(node.value))]
+    else
+      [m(node, :kwsplat)]
     end
   end
 

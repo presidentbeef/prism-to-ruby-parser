@@ -28,6 +28,11 @@ class BasicTests < Minitest::Test
     assert_sexp('x do; 1; 2; end')
   end
 
+  def test_call_with_kwargs
+    assert_sexp('x(**args)')
+    assert_sexp('def y(**); x(**); end')
+  end
+
   def test_simple_integer
     assert_sexp('1')
   end
