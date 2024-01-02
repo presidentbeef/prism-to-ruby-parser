@@ -614,6 +614,15 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :cvdecl, node.name, visit(node.value))
   end
 
+  # class << self
+  def visit_singleton_class_node(node)
+    if node.body
+      m_c(node, :sclass, visit(node.expression), visit_statements_node(node.body, bare: true))
+    else
+      m(node, :sclass, visit(node.expression))
+    end
+  end
+
   # Miscellaneous
 
   def visit_defined_node(node)

@@ -133,4 +133,8 @@ class BasicTests < Minitest::Test
   def test_opasgn2
     assert_sexp('x.y += 1')
   end
+
+  def test_class_self
+    assert_sexp('class << self; end')
+  end
 end
