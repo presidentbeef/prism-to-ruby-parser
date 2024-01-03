@@ -151,7 +151,7 @@ class BasicTests < Minitest::Test
     assert_empty diff, "#{diff.count} of #{pn.count} remaining #{rpn.count / pn.count.to_f * 100}%"
   end
 
-  def test_constant_or_assign
+  def test_constant_assign
     assert_sexp('A::B ||= 1')
     assert_sexp('A::B &&= 1')
     assert_sexp('A::B += 1')
@@ -159,5 +159,14 @@ class BasicTests < Minitest::Test
     assert_sexp('A ||= 1')
     assert_sexp('A &&= 1')
     assert_sexp('A += 1')
+  end
+
+  def test_lots_of_local_writes
+    assert_sexp('x ||= 1')
+    assert_sexp('x &&= 1')
+    assert_sexp('x += 1')
+    assert_sexp('x ||= 1')
+    assert_sexp('x &&= 1')
+    assert_sexp('x += 1')
   end
 end
