@@ -30,7 +30,7 @@ module ConversionTestHelper
     assert_equal from_rp, from_prism
 
     if from_rp.line
-      assert_equal from_rp.line, from_prism.line
+      assert_equal from_rp.line, from_prism.line, "Line mismatch on #{from_rp}"
     end
 
     from_rp.each_with_index do |e, i|
