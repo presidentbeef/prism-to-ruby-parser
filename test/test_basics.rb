@@ -172,4 +172,10 @@ class BasicTests < Minitest::Test
     assert_sexp('@@x &&= 1')
     assert_sexp('@@x += 1')
   end
+
+  def test_lots_of_global_variables
+    assert_sexp('$x ||= 1')
+    assert_sexp('$x &&= 1')
+    assert_sexp('$x += 1')
+  end
 end

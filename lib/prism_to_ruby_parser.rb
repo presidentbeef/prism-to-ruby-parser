@@ -410,6 +410,24 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :gasgn, node.name, visit(node.value))
   end
 
+
+  def visit_global_variable_and_write_node(node)
+    m(node, :op_asgn_and,
+      visit_global_variable_read_node(node),
+      visit_global_variable_write_node(node))
+  end
+
+  def visit_global_variable_or_write_node(node)
+    m(node, :op_asgn_or,
+      visit_global_variable_read_node(node),
+      visit_global_variable_write_node(node))
+  end
+
+  def visit_global_variable_operator_write_node(node)
+    m(node, :gasgn, node.name,
+      m(node, :call, m(node, :gvar, node.name), node.operator, visit(node.value)))
+  end
+
   def visit_alias_global_variable_node(node)
     m(node, :valias, node.new_name.name, node.old_name.name)
   end
@@ -747,7 +765,6 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :cvdecl, node.name,
       m(node, :call, m(node, :cvar, node.name), node.operator, visit(node.value)))
   end
-
 
   # class << self
   def visit_singleton_class_node(node)
