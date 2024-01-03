@@ -89,6 +89,48 @@ class PrismToRubyParserVisitor < Prism::Visitor
     end
   end
 
+  def visit_begin_node(node)
+    result = if node.statements.nil?
+                   m(node, :nil)
+                 else
+                   visit(node.statements)
+                 end
+
+    if node.rescue_clause
+      if node.statements
+        result = m(node.rescue_clause, :rescue, result, visit(node.rescue_clause))
+      else
+        result = m(node.rescue_clause, :rescue, visit(node.rescue_clause))
+      end
+    end
+
+    if node.ensure_clause
+      result = m(node.ensure_clause, :ensure, result, visit(node.ensure_clause))
+    end
+
+    result
+  end
+
+  def visit_rescue_node(node)
+    exceptions = m_c(node, :array, map_visit(node.exceptions))
+
+    statements = if node.statements
+                   visit(node.statements)
+                 else
+                   nil
+                 end
+
+    m(node, :resbody, exceptions, statements)
+  end
+
+  def visit_ensure_node(node)
+    if node.statements
+      visit(node.statements)
+    else
+      m(node, :nil)
+    end
+  end
+
   # Calls and attribute assignments
 
   def visit_call_node(node)
