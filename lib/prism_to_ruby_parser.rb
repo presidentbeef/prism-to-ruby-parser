@@ -367,6 +367,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :gasgn, node.name, visit(node.value))
   end
 
+  def visit_alias_global_variable_node(node)
+    m(node, :valias, node.new_name.name, node.old_name.name)
+  end
+
   def visit_false_node(node)
     m(node, :false)
   end
@@ -541,6 +545,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   def visit_retry_node(node)
     m(node, :retry)
+  end
+
+  def visit_alias_method_node(node)
+    m(node, :alias, visit(node.new_name), visit(node.old_name))
   end
 
   # Conditionals
