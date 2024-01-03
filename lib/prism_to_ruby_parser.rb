@@ -539,6 +539,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :redo)
   end
 
+  def visit_retry_node(node)
+    m(node, :retry)
+  end
+
   # Conditionals
 
   def visit_if_node(node)
