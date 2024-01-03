@@ -317,6 +317,14 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :lasgn, node.name, visit(node.value))
   end
 
+  def visit_global_variable_read_node(node)
+    m(node, :gvar, node.name)
+  end
+
+  def visit_global_variable_write_node(node)
+    m(node, :gasgn, node.name, visit(node.value))
+  end
+
   def visit_false_node(node)
     m(node, :false)
   end
