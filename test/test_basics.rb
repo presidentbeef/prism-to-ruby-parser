@@ -124,6 +124,7 @@ class BasicTests < Minitest::Test
 
   def test_bracket_attribute_assign
     assert_sexp('a[1] ||= 2')
+    assert_sexp('a[1] &&= 2')
   end
 
   def test_constant_assign

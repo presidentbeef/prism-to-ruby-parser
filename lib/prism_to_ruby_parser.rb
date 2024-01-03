@@ -221,6 +221,11 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :op_asgn1, visit(node.receiver), bracket_args, :'||', visit(node.value))
   end
 
+  def visit_index_and_write_node(node)
+    bracket_args = m_c(node, :arglist, visit(node.arguments))
+    m(node, :op_asgn1, visit(node.receiver), bracket_args, :'&&', visit(node.value))
+  end
+
   # x.y += 1
   def visit_call_operator_write_node(node)
     m(node, :op_asgn2, visit(node.receiver), node.write_name, node.operator, visit(node.value))
