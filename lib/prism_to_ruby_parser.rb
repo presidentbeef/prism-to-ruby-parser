@@ -289,8 +289,39 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :cdecl, node.name, visit(node.value))
   end
 
+  def visit_constant_or_write_node(node)
+    m(node, :op_asgn_or, m(node, :const, node.name), m(node, :cdecl, node.name, visit(node.value)))
+  end
+
+  def visit_constant_and_write_node(node)
+    m(node, :op_asgn_and, m(node, :const, node.name), m(node, :cdecl, node.name, visit(node.value)))
+  end
+
+  def visit_constant_operator_write_node(node)
+    m(node,
+      :cdecl,
+      node.name,
+      m(node,
+        :call,
+        m(node, :const, node.name),
+        node.operator,
+        visit(node.value)))
+  end
+
   def visit_constant_path_write_node(node)
     m(node, :cdecl, visit(node.target), visit(node.value))
+  end
+
+  def visit_constant_path_or_write_node(node)
+    m(node, :op_asgn_or, visit(node.target), visit(node.value))
+  end
+
+  def visit_constant_path_and_write_node(node)
+    m(node, :op_asgn_and, visit(node.target), visit(node.value))
+  end
+
+  def visit_constant_path_operator_write_node(node)
+    m(node, :op_asgn, visit(node.target), node.operator, visit(node.value))
   end
 
   def visit_constant_path_node(node)
