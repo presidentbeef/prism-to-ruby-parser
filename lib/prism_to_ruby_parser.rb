@@ -391,6 +391,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_local_variable_and_write_node(node)
+    # Is this being too clever?
     m(node, :op_asgn_and,
       visit_local_variable_read_node(node),
       visit_local_variable_write_node(node))
@@ -729,6 +730,24 @@ class PrismToRubyParserVisitor < Prism::Visitor
   def visit_class_variable_write_node(node)
     m(node, :cvdecl, node.name, visit(node.value))
   end
+
+  def visit_class_variable_and_write_node(node)
+    m(node, :op_asgn_and,
+      visit_class_variable_read_node(node),
+      visit_class_variable_write_node(node))
+  end
+
+  def visit_class_variable_or_write_node(node)
+    m(node, :op_asgn_or,
+      visit_class_variable_read_node(node),
+      visit_class_variable_write_node(node))
+  end
+
+  def visit_class_variable_operator_write_node(node)
+    m(node, :cvdecl, node.name,
+      m(node, :call, m(node, :cvar, node.name), node.operator, visit(node.value)))
+  end
+
 
   # class << self
   def visit_singleton_class_node(node)
