@@ -691,6 +691,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :defined, visit(node.value))
   end
 
+  def visit_numbered_reference_read_node(node)
+    m(node, :nth_ref, node.number)
+  end
+
   # @source="x,y = 1,2"
   # @value=
   #  @ ProgramNode (location: (1,0)-(1,9))
