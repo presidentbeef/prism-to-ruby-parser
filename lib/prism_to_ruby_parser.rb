@@ -673,6 +673,12 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :while, visit(node.predicate), visit(node.statements), flag)
   end
 
+  def visit_until_node(node)
+    flag = !node.begin_modifier? # Flag is backwards between Prism<->RP
+
+    m(node, :until, visit(node.predicate), visit(node.statements), flag)
+  end
+
   # Case / pattern matching
 
   def visit_case_node(node)

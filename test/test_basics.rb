@@ -211,4 +211,12 @@ class BasicTests < Minitest::Test
     assert_sexp('while x do; y; z; end')
     assert_sexp('begin; x; y; end while z')
   end
+
+  def test_until
+    assert_sexp('until x do; end')
+    assert_sexp('until x do; y; end')
+    assert_sexp('until x do; y; z; end')
+    assert_sexp('begin; x; y; end until z')
+  end
+
 end
