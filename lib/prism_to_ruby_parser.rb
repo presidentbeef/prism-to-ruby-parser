@@ -585,8 +585,8 @@ class PrismToRubyParserVisitor < Prism::Visitor
       n.concat map_visit(node.keywords)  # Keyword arguments
       n << visit(node.rest) if node.rest # The rest
       n << visit(node.keyword_rest) if node.keyword_rest
-      n << visit(node.block) if node.block # Block argument
       n.concat map_visit(node.posts)     # Regular arguments, but later?
+      n << visit(node.block) if node.block # Block argument
 
       @in_parameters = false
     end
