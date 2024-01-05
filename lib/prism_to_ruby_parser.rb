@@ -667,6 +667,26 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :if, condition, else_clause, then_clause)
   end
 
+  # Case / pattern matching
+
+  def visit_case_node(node)
+    predicate = visit(node.predicate)
+    conditions = map_visit(node.conditions)
+    else_clause = visit(node.consequent)
+
+    m_c(node, :case, predicate, conditions) << else_clause
+  end
+
+  def visit_when_node(node)
+    conditions = m_c(node, :array, map_visit(node.conditions))
+
+    if node.statements
+      m_c(node, :when, conditions, visit_statements_node(node.statements, bare: true))
+    else
+      m(node, :when, conditions, nil)
+    end
+  end
+
   # Strings
 
   def visit_string_node(node)
