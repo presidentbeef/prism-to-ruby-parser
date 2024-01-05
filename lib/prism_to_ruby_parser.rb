@@ -567,7 +567,9 @@ class PrismToRubyParserVisitor < Prism::Visitor
              end
 
     if node.body
+      @in_def = true
       result.concat(visit_statements_node(node.body, bare: true))
+      @in_def = false
     else
       result << m(node, :nil)
     end
@@ -870,7 +872,11 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_class_variable_write_node(node)
-    m(node, :cvdecl, node.name, visit(node.value))
+    if @in_def # :(
+      m(node, :cvasgn, node.name, visit(node.value))
+    else
+      m(node, :cvdecl, node.name, visit(node.value))
+    end
   end
 
   def visit_class_variable_and_write_node(node)
