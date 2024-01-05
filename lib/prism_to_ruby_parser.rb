@@ -359,6 +359,7 @@ class PrismToRubyParserVisitor < Prism::Visitor
     flags |= Regexp::MULTILINE if node.multi_line?
     flags |= Regexp::IGNORECASE if node.ignore_case?
     flags |= Regexp::EXTENDED if node.extended?
+    flags |= Regexp::ENC_NONE if node.ascii_8bit?
 
     m(node, :lit, Regexp.new(node.unescaped, flags))
   end
@@ -715,6 +716,8 @@ class PrismToRubyParserVisitor < Prism::Visitor
              :dstr
            when Prism::InterpolatedXStringNode
              :dxstr
+           when Prism::InterpolatedRegularExpressionNode
+             :dregx
            else
              raise "Unexpected type: #{node.class}"
            end
@@ -741,9 +744,34 @@ class PrismToRubyParserVisitor < Prism::Visitor
     visit_interpolated_string_node(node)
   end
 
+  def visit_interpolated_regular_expression_node(node)
+    result = visit_interpolated_string_node(node)
+
+    flags = 0
+
+    flags |= Regexp::MULTILINE if node.multi_line?
+    flags |= Regexp::IGNORECASE if node.ignore_case?
+    flags |= Regexp::EXTENDED if node.extended?
+    flags |= Regexp::ENC_NONE if node.ascii_8bit?
+
+    if flags != 0
+      result << flags
+    end
+
+    if node.once?
+      result.sexp_type = :dregx_once
+    end
+
+    result
+  end
+
+  def visit_interpolated_symbol_node(node)
+    visit_interpolated_string_node(node)
+  end
+
   def visit_embedded_statements_node(node)
     m(node, :evstr) do |n|
-      n << visit(node.statements)
+      n << visit(node.statements) if node.statements
     end
   end
 
