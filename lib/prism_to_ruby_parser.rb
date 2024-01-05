@@ -736,6 +736,8 @@ class PrismToRubyParserVisitor < Prism::Visitor
              :dstr
            when Prism::InterpolatedXStringNode
              :dxstr
+           when Prism::InterpolatedSymbolNode
+             :dsym
            when Prism::InterpolatedRegularExpressionNode
              :dregx
            else
