@@ -134,6 +134,16 @@ class PrismToRubyParserVisitor < Prism::Visitor
   # Calls and attribute assignments
 
   def visit_call_node(node)
+    if node.name == :'=~' and
+        (node.receiver.is_a? Prism::StringNode or
+         node.receiver.is_a? Prism::RegularExpressionNode)
+
+      # RP special cases
+      # /x/ =~ 'y'
+      # 'y' =~ /x/
+      return make_match_node(node)
+    end
+
     type = case
            when node.attribute_write? && node.safe_navigation?
              :safe_attrasgn
@@ -238,6 +248,16 @@ class PrismToRubyParserVisitor < Prism::Visitor
       if node.block.body
         n << visit(node.block)
       end
+    end
+  end
+
+  def make_match_node(node)
+    if node.receiver.is_a? Prism::StringNode
+      m(node, :match3, visit(node.arguments).first, visit(node.receiver))
+    elsif node.receiver.is_a? Prism::RegularExpressionNode
+      m(node, :match2, visit(node.receiver), visit(node.arguments).first)
+    else
+      raise "Unexpected values for match node: #{node.inspect}"
     end
   end
 
@@ -898,6 +918,13 @@ class PrismToRubyParserVisitor < Prism::Visitor
   def visit_numbered_reference_read_node(node)
     m(node, :nth_ref, node.number)
   end
+
+  # if /x/
+  def visit_match_last_line_node(node)
+    m(node, :match, visit_regular_expression_node(node))
+  end
+
+  # Multi-assigns
 
   # @source="x,y = 1,2"
   # @value=
