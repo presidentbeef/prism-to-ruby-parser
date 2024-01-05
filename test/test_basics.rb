@@ -197,4 +197,11 @@ class BasicTests < Minitest::Test
   def test_forwarding
     assert_sexp('def x(...); y(...); end')
   end
+
+  def test_some_multiassigns
+    assert_sexp('x, y = 1, 2')
+    assert_sexp('x, y = *z')
+    assert_sexp('x, = *z')
+    assert_sexp('@x, @@y, Z, Y::W, $Q, * = 1,2,3,4,5')
+  end
 end

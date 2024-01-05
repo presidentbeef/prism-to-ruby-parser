@@ -962,6 +962,14 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m_c(node, :attrasgn, visit(node.receiver), :[]=, visit(node.arguments))
   end
 
+  def visit_class_variable_target_node(node)
+    m(node, :cvdecl, node.name)
+  end
+
+  def visit_global_variable_target_node(node)
+    m(node, :gasgn, node.name)
+  end
+
   def visit_multi_target_node(node)
     if @in_parameters
       # When there is an masgn inside a block parameter list,
