@@ -271,6 +271,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :block_pass, visit(node.expression))
   end
 
+  def visit_forwarding_arguments_node(node)
+    m(node, :forward_args)
+  end
+
   def visit_arguments_node(node)
     # Return array of arguments - ruby_parser does not have a node type
     # for method arguments
@@ -598,6 +602,10 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   def visit_block_parameter_node(node)
     :"&#{node.name}"
+  end
+
+  def visit_forwarding_parameter_node(node)
+    m(node, :forward_args)
   end
 
   def visit_return_node(node)
