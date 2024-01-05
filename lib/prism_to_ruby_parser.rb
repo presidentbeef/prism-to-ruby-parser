@@ -823,6 +823,18 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :defined, visit(node.value))
   end
 
+  def visit_undef_node(node)
+    if node.names.length > 1
+      undefs = node.names.map do |n|
+        m(n, :undef, visit(n))
+      end
+
+      m_c(node, :block, undefs)
+    else
+      m(node, :undef, visit(node.names.first))
+    end
+  end
+
   def visit_numbered_reference_read_node(node)
     m(node, :nth_ref, node.number)
   end

@@ -2713,6 +2713,7 @@ class ParseTreeTestCase < Minitest::Test
                                   s(:undef, s(:lit, :z)))),
             "Ruby2Ruby"    => "f1\n(undef :x\nundef :y\nundef :z)\n")
 
+  # WHYYYY
   add_tests("undef_block_3_post",
             "Ruby"         => "undef :x, :y, :z\nf2",
             "ParseTree"    => s(:block,
@@ -2722,6 +2723,7 @@ class ParseTreeTestCase < Minitest::Test
                                 s(:call, nil, :f2)),
             "Ruby2Ruby"    => "undef :x\nundef :y\nundef :z\nf2\n")
 
+  # WHYYYY
   add_tests("undef_block_wtf",
             "Ruby"         => "f1\nundef :x, :y, :z\nf2",
             "ParseTree"    => s(:block,
