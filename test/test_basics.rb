@@ -204,4 +204,11 @@ class BasicTests < Minitest::Test
     assert_sexp('x, = *z')
     assert_sexp('@x, @@y, Z, Y::W, $Q, * = 1,2,3,4,5')
   end
+
+  def test_awhile
+    assert_sexp('while x do; end')
+    assert_sexp('while x do; y; end')
+    assert_sexp('while x do; y; z; end')
+    assert_sexp('begin; x; y; end while z')
+  end
 end
