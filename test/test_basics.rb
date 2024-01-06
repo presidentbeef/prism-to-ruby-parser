@@ -219,4 +219,12 @@ class BasicTests < Minitest::Test
     assert_sexp('begin; x; y; end until z')
   end
 
+  def test_rescue_in_def
+    assert_sexp('def x; blah; blah; rescue; y; z; end')
+  end
+
+  def test_files_and_lines
+    assert_sexp('__FILE__')
+    assert_sexp('__LINE__')
+  end
 end

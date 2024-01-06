@@ -938,6 +938,18 @@ class PrismToRubyParserVisitor < Prism::Visitor
     m(node, :match, visit_regular_expression_node(node))
   end
 
+  def visit_source_file_node(node)
+    if node.filepath == ''
+      m(node, :str, '(string)')
+    else
+      m(node, :str, node.filepath)
+    end
+  end
+
+  def visit_source_line_node(node)
+    m(node, :lit, node.location.start_line)
+  end
+
   # Multi-assigns
 
   # @source="x,y = 1,2"
