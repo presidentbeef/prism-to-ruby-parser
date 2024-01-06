@@ -568,7 +568,13 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
     if node.body
       @in_def = true
-      result.concat(visit_statements_node(node.body, bare: true))
+
+      if node.body.is_a? Prism::StatementsNode
+        result.concat(visit_statements_node(node.body, bare: true))
+      else
+        result << visit(node.body)
+      end
+
       @in_def = false
     else
       result << m(node, :nil)
