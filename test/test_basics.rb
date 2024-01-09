@@ -227,4 +227,10 @@ class BasicTests < Minitest::Test
     assert_sexp('__FILE__')
     assert_sexp('__LINE__')
   end
+
+  def test_lasgn_splat
+    assert_sexp('x = *y, 1')
+    assert_sexp('x = *y')
+    assert_sexp('x = *[y]')
+  end
 end

@@ -412,7 +412,17 @@ class PrismToRubyParserVisitor < Prism::Visitor
   end
 
   def visit_local_variable_write_node(node)
-    m(node, :lasgn, node.name, visit(node.value))
+    value = visit(node.value)
+
+    if node.value.is_a? Prism::ArrayNode and node.value.contains_splat?
+      if node.value.elements.length == 1
+        value = value.last
+      end
+
+      value = m(node, :svalue, value)
+    end
+
+    m(node, :lasgn, node.name, value)
   end
 
   def visit_local_variable_and_write_node(node)
