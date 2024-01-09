@@ -498,6 +498,11 @@ class PrismToRubyParserVisitor < Prism::Visitor
     [visit(node.key), visit(node.value)]
   end
 
+  # { x: }
+  def visit_implicit_node(node)
+    nil
+  end
+
   def visit_splat_node(node)
     if node.expression
       m(node, :splat, visit(node.expression))

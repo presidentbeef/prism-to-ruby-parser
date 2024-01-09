@@ -5187,3 +5187,7 @@ class TestRubyParserV27 < RubyParserTestCase
     assert_parse rb, pt
   end
 end
+
+class TestRubyParserV32 < RubyParserTestCase
+  include TestRubyParserShared32Plus
+end
