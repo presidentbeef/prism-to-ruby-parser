@@ -233,4 +233,9 @@ class BasicTests < Minitest::Test
     assert_sexp('x = *y')
     assert_sexp('x = *[y]')
   end
+
+  def test_simple_match
+    assert_sexp('[0, 1] => _, x')
+    assert_sexp('{y: 2} => y: z')
+  end
 end

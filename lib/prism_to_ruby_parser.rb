@@ -1,6 +1,6 @@
 require 'prism'
 
-class PrismToRubyParserVisitor < Prism::Visitor
+class PrismToRubyParserVisitor < Prism::BasicVisitor
   # Helper functions
 
   def set_line(p_node, new_sexp)
@@ -1096,5 +1096,22 @@ class PrismToRubyParserVisitor < Prism::Visitor
 
   def visit_and_node(node)
     m(node, :and, visit(node.left), visit(node.right))
+  end
+
+  # Pattern Matching
+
+  def visit_match_required_node(node)
+    # Not really sure what 'nil' means here
+    m(node, :case, visit(node.value), m(node, :in, visit(node.pattern), nil), nil)
+  end
+
+  def visit_array_pattern_node(node)
+    # Not really sure what 'nil' means here
+    m_c(node, :array_pat, nil, map_visit(node.requireds))
+  end
+
+  def visit_hash_pattern_node(node)
+    # Not really sure what 'nil' means here
+    m_c(node, :hash_pat, nil, map_visit(node.elements))
   end
 end
