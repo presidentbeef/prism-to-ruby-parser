@@ -1112,6 +1112,6 @@ class PrismToRubyParserVisitor < Prism::BasicVisitor
 
   def visit_hash_pattern_node(node)
     # Not really sure what 'nil' means here
-    m_c(node, :hash_pat, nil, map_visit(node.elements))
+    m_c(node, :hash_pat, nil, map_visit(node.elements).flatten(1))
   end
 end
