@@ -829,7 +829,7 @@ class PrismToRubyParserVisitor < Prism::BasicVisitor
       when Prism::InterpolatedRegularExpressionNode
         m(node, :lit, /#{parts.first}#{parts.last.value}/)
       end
-    elsif parts.length == 1 and parts.first.is_a? String
+    elsif parts in [String]
       # e.g. s(:dstr, '') -> s(:str, '')
 
       case node
