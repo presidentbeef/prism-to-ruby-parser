@@ -763,6 +763,15 @@ class PrismToRubyParserVisitor < Prism::BasicVisitor
     end
   end
 
+  def visit_match_predicate_node(node)
+    predicate = visit(node.value)
+    pattern = visit(node.pattern)
+    else_clause = nil
+    in_guard = nil # Not 100% sure this is what this is
+
+    m(node, :case, predicate, m(node, :in, pattern, in_guard), else_clause)
+  end
+
   # Strings
 
   def visit_string_node(node)

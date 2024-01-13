@@ -264,4 +264,8 @@ class BasicTests < Minitest::Test
   def test_rescue_modifier
     assert_sexp('x rescue nil')
   end
+
+  def test_simple_pattern_predicates
+    assert_sexp('{a: 1, b: 2} in {a:}')
+  end
 end
