@@ -134,6 +134,15 @@ class PrismToRubyParserVisitor < Prism::BasicVisitor
     m(node, :resbody, exceptions, statements)
   end
 
+  def visit_rescue_modifier_node(node)
+    resbody = m(node,
+                :resbody,
+                m(node, :array),
+                visit(node.rescue_expression))
+
+    m(node, :rescue, visit(node.expression), resbody)
+  end
+
   def visit_ensure_node(node)
     if node.statements
       visit(node.statements)

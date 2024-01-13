@@ -260,4 +260,8 @@ class BasicTests < Minitest::Test
     # We go farther than RP here
     # assert_sexp(':"a#{:b}c#{:d}e"')
   end
+
+  def test_rescue_modifier
+    assert_sexp('x rescue nil')
+  end
 end
