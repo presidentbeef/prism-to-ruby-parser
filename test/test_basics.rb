@@ -238,4 +238,26 @@ class BasicTests < Minitest::Test
     assert_sexp('[0, 1] => _, x')
     assert_sexp('{y: 2} => y: z')
   end
+
+  def test_interpolated_strings_and_things
+    assert_sexp('"#{""}"')
+    assert_sexp('"#{"a"}#{"b"}"')
+    assert_sexp('"a#{"b"}c#{"d"}"')
+    assert_sexp('"a#{"b"}c#{"d"}e"')
+
+
+    assert_sexp('`a#{"b"}c#{"d"}e`')
+    assert_sexp(':"a#{"b"}c#{"d"}e"')
+    assert_sexp('/a#{"b"}c#{"d"}e/')
+
+    assert_sexp('"a#{x}"')
+    assert_sexp('`a#{x}`')
+    assert_sexp(':"a#{x}"')
+    assert_sexp('/"a#{x}/')
+
+    assert_sexp('"#{a} b"')
+
+    # We go farther than RP here
+    # assert_sexp(':"a#{:b}c#{:d}e"')
+  end
 end

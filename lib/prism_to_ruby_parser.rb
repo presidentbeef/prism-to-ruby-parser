@@ -54,6 +54,17 @@ class PrismToRubyParserVisitor < Prism::BasicVisitor
     node_array.map { |n| visit(n) }
   end
 
+  def sexp_type?(sexp, type)
+    sexp.is_a? Sexp and
+      sexp.sexp_type == type
+  end
+
+  def set_value(sexp, value)
+    raise unless sexp.is_a? Sexp and sexp.length == 2
+
+    sexp[1] = value
+  end
+
   # Structure nodes
 
   def visit_program_node(node)
@@ -767,21 +778,63 @@ class PrismToRubyParserVisitor < Prism::BasicVisitor
              raise "Unexpected type: #{node.class}"
            end
 
-    m(node, type) do |n|
-      node.parts.each_with_index do |part, i|
-        if i == 0 # only for first part of string
-          if part.is_a? Prism::StringNode
-            n << part.unescaped
-            next
-          else
-            # RP explicitly uses a bare empty string
-            # if the first value is not a string
-            n << ''
-          end
-        end
+    parts = []
 
-        n << visit(part)
+    node.parts.each_with_index do |part, i|
+      if i == 0 # only for first part of string
+        if part.is_a? Prism::StringNode
+          parts << part.unescaped
+          next
+        else
+          # RP explicitly uses a bare empty string
+          # if the first value is not a string
+          parts << ''
+        end
       end
+
+      str = visit(part)
+
+      if sexp_type?(str, :str)
+        if sexp_type?(parts.last, :str)
+          set_value(parts.last, "#{parts.last.value}#{str.value}")
+        elsif parts.last.is_a? String
+          parts.last << str.value
+        else
+          parts << str
+        end
+      else
+        parts << str
+      end
+    end
+
+    # RP simplifies interpolation if the values are simple strings
+    # e.g. "#{'a"}" -> s(:str, 'a')
+    if parts.length == 2 and parts.first.is_a? String and sexp_type?(parts.last, :str)
+      case node
+      when Prism::InterpolatedStringNode
+        m(node, :str, "#{parts.first}#{parts.last.value}")
+      when Prism::InterpolatedXStringNode
+        m(node, :xstr, "#{parts.first}#{parts.last.value}")
+      when Prism::InterpolatedSymbolNode
+        m(node, :lit, :"#{parts.first}#{parts.last.value}")
+      when Prism::InterpolatedRegularExpressionNode
+        m(node, :lit, /#{parts.first}#{parts.last.value}/)
+      end
+    elsif parts.length == 1 and parts.first.is_a? String
+      # e.g. s(:dstr, '') -> s(:str, '')
+
+      case node
+      when Prism::InterpolatedStringNode
+        m(node, :str, parts.first)
+      when Prism::InterpolatedXStringNode
+        m(node, :xstr, parts.first)
+      when Prism::InterpolatedSymbolNode
+        m(node, :lit, parts.first.to_sym)
+      when Prism::InterpolatedRegularExpressionNode
+        m(node, :lit, /#{parts.first}/)
+      end
+    else
+      m_c(node, type, parts)
     end
   end
 
@@ -815,8 +868,15 @@ class PrismToRubyParserVisitor < Prism::BasicVisitor
   end
 
   def visit_embedded_statements_node(node)
-    m(node, :evstr) do |n|
+    result = m(node, :evstr) do |n|
       n << visit(node.statements) if node.statements
+    end
+
+    # s(:evstr, s(:str, '...'))
+    if result.length == 2 and sexp_type?(result.last, :str)
+      result.last
+    else
+      result
     end
   end
 
