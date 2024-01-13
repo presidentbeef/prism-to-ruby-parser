@@ -743,6 +743,12 @@ class PrismToRubyParserVisitor < Prism::BasicVisitor
     m(node, :until, visit(node.predicate), visit(node.statements), flag)
   end
 
+  def visit_for_node(node)
+    m(node, :for, visit(node.collection), visit(node.index)) do |n|
+      n << visit(node.statements) if node.statements
+    end
+  end
+
   # Case / pattern matching
 
   def visit_case_node(node)
