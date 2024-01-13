@@ -1049,6 +1049,12 @@ class PrismToRubyParserVisitor < Prism::BasicVisitor
     m(node, :lit, node.location.start_line)
   end
 
+  def visit_pre_execution_node(node)
+    m(node, :iter, m(node, :preexe), 0) do |n|
+      n << visit(node.statements) if node.statements
+    end
+  end
+
   # Multi-assigns
 
   # @source="x,y = 1,2"
