@@ -154,7 +154,7 @@ class BasicTests < Minitest::Test
 
   def test_prism_node_coverage
     pn = Prism::Visitor.instance_methods(false).grep(/^visit_/).sort
-    rpn = PrismToRubyParserVisitor.instance_methods(false).grep(/^visit_/).sort
+    rpn = PrismToRubyParser::Visitor.instance_methods(false).grep(/^visit_/).sort
     diff = pn - rpn
 
     assert_empty diff, "#{diff.count} of #{pn.count} remaining #{rpn.count / pn.count.to_f * 100}%"
