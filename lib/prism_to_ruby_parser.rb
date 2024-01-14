@@ -304,11 +304,30 @@ class PrismToRubyParserVisitor < Prism::BasicVisitor
   end
 
   def visit_block_parameters_node(node)
-    visit(node.parameters)
+    # Explicitly local block variables
+    shadows = if node.locals.any?
+                m_c(node, :shadow, map_visit(node.locals))
+              else
+                nil
+              end
+
+    if node.parameters
+      visit(node.parameters).tap do |params|
+        params << shadows if shadows
+      end
+    elsif shadows # only shadowed params
+      m(node, :args, shadows)
+    else
+      m(node, :args)
+    end
   end
 
   def visit_block_argument_node(node)
     m(node, :block_pass, visit(node.expression))
+  end
+
+  def visit_block_local_variable_node(node)
+    node.name
   end
 
   def visit_forwarding_arguments_node(node)
