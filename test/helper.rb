@@ -16,7 +16,7 @@ module ConversionTestHelper
 
     assert output.errors.empty?, 'Errors parsing with Prism'
 
-    PrismToRubyParserVisitor.new.visit(output.value)
+    PrismToRubyParser.convert(output)
   end
 
   def assert_sexp(src)

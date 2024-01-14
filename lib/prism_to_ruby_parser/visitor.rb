@@ -1,3 +1,5 @@
+require 'sexp_processor'
+
 module PrismToRubyParser
   class Visitor < Prism::BasicVisitor
     # Helper functions
