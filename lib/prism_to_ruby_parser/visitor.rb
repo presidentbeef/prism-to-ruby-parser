@@ -1051,6 +1051,11 @@ module PrismToRubyParser
       m(node, :nth_ref, node.number)
     end
 
+    # $', $&, $`, etc.
+    def visit_back_reference_read_node(node)
+      m(node, :back_ref, node.name[-1].to_sym)
+    end
+
     # if /x/
     def visit_match_last_line_node(node)
       m(node, :match, visit_regular_expression_node(node))
