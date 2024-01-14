@@ -268,4 +268,8 @@ class BasicTests < Minitest::Test
   def test_simple_pattern_predicates
     assert_sexp('{a: 1, b: 2} in {a:}')
   end
+
+  def test_simple_case_matching
+    assert_sexp("case x; in [String]; y; z; else; a; end")
+  end
 end
