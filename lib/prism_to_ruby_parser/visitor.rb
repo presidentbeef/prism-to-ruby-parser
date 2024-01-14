@@ -72,6 +72,8 @@ module PrismToRubyParser
     end
 
     def visit_statements_node(node, bare: false)
+      return nil if node.nil?
+
       if node.body.length > 1
         if bare
           map_visit(node.body)
@@ -1219,7 +1221,16 @@ module PrismToRubyParser
     end
 
     # Pattern Matching
+    
+    def visit_case_match_node(node)
+      m_c(node, :case, visit(node.predicate), map_visit(node.conditions))
+    end
 
+    def visit_in_node(node)
+      m_c(node, :in, visit(node.pattern), visit_statements_node(node.statements, bare: true)) 
+    end
+
+    # x in y
     def visit_match_required_node(node)
       # Not really sure what 'nil' means here
       m(node, :case, visit(node.value), m(node, :in, visit(node.pattern), nil), nil)
