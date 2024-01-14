@@ -1,7 +1,11 @@
 source 'https://rubygems.org'
 
-gem 'ruby_parser'
-gem 'racc'
-gem 'prism'
-gem 'minitest'
-gem 'rake'
+ruby '>= 3.3.0'
+
+gemspec
+
+group :test do
+  gem 'ruby_parser'
+  gem 'minitest'
+  gem 'rake'
+end
