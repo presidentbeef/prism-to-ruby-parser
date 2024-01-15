@@ -1229,7 +1229,13 @@ module PrismToRubyParser
     end
 
     def visit_in_node(node)
-      m(node, :in, visit(node.pattern)).tap do |n|
+      pattern = if node.pattern.is_a? Prism::ConstantPathNode
+                  visit_pattern_constant(node.pattern)
+                else
+                  visit(node.pattern)
+                end
+
+      m(node, :in, pattern).tap do |n|
         if node.statements
           n.concat visit_statements_node(node.statements, bare: true)
         else
