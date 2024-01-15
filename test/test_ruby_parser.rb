@@ -4193,6 +4193,7 @@ module TestPatternMatching
     assert_case_in "/regexp/", s(:lit, /regexp/).line(2)
   end
 
+  # Prism bug for all of these?
   def test_case_in_78
     assert_case_in "%W[a b]", s(:array_pat, nil, s(:str, "a").line(2), s(:str, "b").line(2)).line(2)
   end

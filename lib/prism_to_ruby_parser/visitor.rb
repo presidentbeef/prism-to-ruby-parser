@@ -1224,12 +1224,18 @@ module PrismToRubyParser
     
     def visit_case_match_node(node)
       m_c(node, :case, visit(node.predicate), map_visit(node.conditions)).tap do |n|
-        n << visit(node.consequent) if node.consequent
+        n << visit(node.consequent)
       end
     end
 
     def visit_in_node(node)
-      m_c(node, :in, visit(node.pattern), visit_statements_node(node.statements, bare: true)) 
+      m(node, :in, visit(node.pattern)).tap do |n|
+        if node.statements
+          n.concat visit_statements_node(node.statements, bare: true)
+        else
+          n << nil
+        end
+      end
     end
 
     # x in y
@@ -1240,12 +1246,61 @@ module PrismToRubyParser
 
     def visit_array_pattern_node(node)
       # Not really sure what 'nil' means here
-      m_c(node, :array_pat, nil, map_visit(node.requireds))
+      m_c(node, :array_pat, nil, map_visit(node.requireds)).tap do |n|
+        if node.rest
+          if node.rest.is_a? Prism::SplatNode
+            n << visit_array_pattern_splat_node(node.rest)
+          else
+            n << visit(node.rest)
+          end
+        end
+
+        if node.posts
+          n.concat map_visit(node.posts)
+        end
+      end
+    end
+
+    # Actually splat_node but in a pattern
+    def visit_array_pattern_splat_node(node)
+      raise "Expected Prism::SplatNode but got #{node.class}" unless node.is_a? Prism::SplatNode
+
+      if node.expression # Expecting Prism::LocalVariableTargetNode
+        :"*#{node.expression.name}"
+      else
+        :"*"
+      end
     end
 
     def visit_hash_pattern_node(node)
       # Not really sure what 'nil' means here
-      m_c(node, :hash_pat, nil, map_visit(node.elements).flatten(1))
+      m_c(node, :hash_pat, nil, map_visit(node.elements).flatten(1)).tap do |n|
+        if node.rest
+          if node.rest.is_a? Prism::AssocSplatNode
+            n << visit_hash_pattern_assoc_splat_node(node.rest)
+          else
+            n << visit(node.rest)
+          end
+        end
+      end
+    end
+
+    # Actually assoc_splat_node but in a pattern
+    def visit_hash_pattern_assoc_splat_node(node)
+      raise "Expected Prism::AssocSplatNode but got #{node.class}" unless node.is_a? Prism::AssocSplatNode
+
+      name = if node.value # Expecting Prism::LocalVariableTargetNode
+               :"**#{node.value.name}"
+             else
+               :"**"
+             end
+
+      m(node, :kwrest, name)
+    end
+
+    # **nil
+    def visit_no_keywords_parameter_node(node)
+      m(node, :kwrest, :"**nil")
     end
 
     def visit_pinned_variable_node(node)
