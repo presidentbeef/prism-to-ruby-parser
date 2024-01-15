@@ -1245,7 +1245,7 @@ module PrismToRubyParser
     end
 
     def visit_array_pattern_node(node)
-      constant = visit(node.constant)
+      constant = visit_pattern_constant(node.constant)
 
       m_c(node, :array_pat, constant, map_visit(node.requireds)).tap do |n|
         if node.rest
@@ -1274,7 +1274,9 @@ module PrismToRubyParser
     end
 
     def visit_hash_pattern_node(node)
-      m_c(node, :hash_pat, visit(node.constant), map_visit(node.elements).flatten(1)).tap do |n|
+      constant = visit_pattern_constant(node.constant)
+
+      m_c(node, :hash_pat, constant, map_visit(node.elements).flatten(1)).tap do |n|
         if node.rest
           if node.rest.is_a? Prism::AssocSplatNode
             n << visit_hash_pattern_assoc_splat_node(node.rest)
@@ -1339,6 +1341,17 @@ module PrismToRubyParser
 
     def visit_alternation_pattern_node(node)
       m(node, :or, visit(node.left), visit(node.right))
+    end
+
+    def visit_pattern_constant(node)
+      constant = visit(node)
+
+      if constant and constant.sexp_type == :colon2
+        # Not sure why...
+        constant = m(node, :const, constant)
+      end
+
+      constant
     end
   end
 end
