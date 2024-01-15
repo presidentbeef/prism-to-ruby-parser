@@ -1245,8 +1245,9 @@ module PrismToRubyParser
     end
 
     def visit_array_pattern_node(node)
-      # Not really sure what 'nil' means here
-      m_c(node, :array_pat, nil, map_visit(node.requireds)).tap do |n|
+      constant = visit(node.constant)
+
+      m_c(node, :array_pat, constant, map_visit(node.requireds)).tap do |n|
         if node.rest
           if node.rest.is_a? Prism::SplatNode
             n << visit_array_pattern_splat_node(node.rest)
