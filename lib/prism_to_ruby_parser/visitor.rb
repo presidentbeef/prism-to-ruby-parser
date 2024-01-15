@@ -1247,5 +1247,9 @@ module PrismToRubyParser
       # Not really sure what 'nil' means here
       m_c(node, :hash_pat, nil, map_visit(node.elements).flatten(1))
     end
+
+    def visit_pinned_variable_node(node)
+      visit(node.variable)
+    end
   end
 end
