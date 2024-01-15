@@ -1223,7 +1223,9 @@ module PrismToRubyParser
     # Pattern Matching
     
     def visit_case_match_node(node)
-      m_c(node, :case, visit(node.predicate), map_visit(node.conditions))
+      m_c(node, :case, visit(node.predicate), map_visit(node.conditions)).tap do |n|
+        n << visit(node.consequent) if node.consequent
+      end
     end
 
     def visit_in_node(node)
