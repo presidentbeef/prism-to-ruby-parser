@@ -1312,5 +1312,24 @@ module PrismToRubyParser
 
       target << value
     end
+
+    def visit_find_pattern_node(node)
+      constant = visit(node.constant)
+      left = if node.left
+               visit_array_pattern_splat_node(node.left)
+             else
+               nil
+             end
+
+      requireds = map_visit(node.requireds)
+
+      right = if node.right
+                visit_array_pattern_splat_node(node.right)
+              else
+                nil
+              end
+
+      m(node, :find_pat, constant, left, *requireds, right)
+    end
   end
 end
