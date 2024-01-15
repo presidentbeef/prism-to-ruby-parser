@@ -1273,8 +1273,7 @@ module PrismToRubyParser
     end
 
     def visit_hash_pattern_node(node)
-      # Not really sure what 'nil' means here
-      m_c(node, :hash_pat, nil, map_visit(node.elements).flatten(1)).tap do |n|
+      m_c(node, :hash_pat, visit(node.constant), map_visit(node.elements).flatten(1)).tap do |n|
         if node.rest
           if node.rest.is_a? Prism::AssocSplatNode
             n << visit_hash_pattern_assoc_splat_node(node.rest)
