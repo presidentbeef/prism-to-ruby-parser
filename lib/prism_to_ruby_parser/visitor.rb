@@ -1335,5 +1335,9 @@ module PrismToRubyParser
     def visit_pinned_expression_node(node)
       visit(node.expression)
     end
+
+    def visit_alternation_pattern_node(node)
+      m(node, :or, visit(node.left), visit(node.right))
+    end
   end
 end
