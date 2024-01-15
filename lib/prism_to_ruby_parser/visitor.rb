@@ -1331,5 +1331,9 @@ module PrismToRubyParser
 
       m(node, :find_pat, constant, left, *requireds, right)
     end
+
+    def visit_pinned_expression_node(node)
+      visit(node.expression)
+    end
   end
 end
