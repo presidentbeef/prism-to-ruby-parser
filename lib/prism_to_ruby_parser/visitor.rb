@@ -1306,5 +1306,12 @@ module PrismToRubyParser
     def visit_pinned_variable_node(node)
       visit(node.variable)
     end
+
+    def visit_capture_pattern_node(node)
+      target = visit(node.target)
+      value = visit(node.value)
+
+      target << value
+    end
   end
 end
