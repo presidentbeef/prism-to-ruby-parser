@@ -272,5 +272,13 @@ class BasicTests < Minitest::Test
   def test_simple_case_matching
     assert_sexp("case x; in [String]; y; z; else; a; end")
     assert_sexp("w = 1; case x; in ^w; y(x); z; else; a; end")
+    assert_sexp(<<~RUBY)
+      case data
+      in { a: Integer, **a }
+        "matched"
+      else
+        "not matched"
+      end
+    RUBY
   end
 end
