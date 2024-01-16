@@ -64,6 +64,12 @@ rake
 
 Tests are very much failing right now!
 
+## Known Issues
+
+* Numbered block parameters (e.g. `_1`) have different representation
+* Alternative arrays in pattern matching (e.g. `case [] in %w[a] ...`) are not handled by Prism
+* No timeout support
+
 ## License
 
 MIT - See LICENSE
