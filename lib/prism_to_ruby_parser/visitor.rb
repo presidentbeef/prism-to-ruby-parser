@@ -1075,6 +1075,10 @@ module PrismToRubyParser
       m(node, :lit, node.location.start_line)
     end
 
+    def visit_source_encoding_node(node)
+      m(node, :colon2, m(node, :const, :Encoding), :UTF_8)
+    end
+
     def visit_pre_execution_node(node)
       m(node, :iter, m(node, :preexe), 0) do |n|
         n << visit(node.statements) if node.statements

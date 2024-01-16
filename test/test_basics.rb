@@ -281,4 +281,12 @@ class BasicTests < Minitest::Test
       end
     RUBY
   end
+
+  def test_simple_numbered_block_params
+    assert_sexp('x { _1 }')
+  end
+
+  def test_encoding
+    assert_sexp('__ENCODING__')
+  end
 end
