@@ -332,6 +332,11 @@ module PrismToRubyParser
       node.name
     end
 
+    def visit_numbered_parameters_node(node)
+      # Not supported right now
+      # RP does not really handle these
+    end
+
     def visit_forwarding_arguments_node(node)
       m(node, :forward_args)
     end
