@@ -1108,6 +1108,16 @@ module PrismToRubyParser
       end
     end
 
+    def visit_flip_flop_node(node)
+      type = if node.exclude_end?
+               :flip3
+             else
+               :flip2
+             end
+
+      m(node, type, visit(node.left), visit(node.right))
+    end
+
     # Multi-assigns
 
     # @source="x,y = 1,2"
