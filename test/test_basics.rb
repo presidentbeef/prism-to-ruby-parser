@@ -289,4 +289,8 @@ class BasicTests < Minitest::Test
   def test_encoding
     assert_sexp('__ENCODING__')
   end
+
+  def test_imaginary_numbers
+    assert_sexp('0b10i')
+  end
 end

@@ -407,14 +407,6 @@ module PrismToRubyParser
       end
     end
 
-    def visit_integer_node(node)
-      m(node, :lit, node.value)
-    end
-
-    def visit_float_node(node)
-      m(node, :lit, node.value)
-    end
-
     def visit_symbol_node(node)
       m(node, :lit, node.unescaped.to_sym)
     end
@@ -452,6 +444,26 @@ module PrismToRubyParser
         end
       end
     end
+
+    # Numbers
+
+    def visit_integer_node(node)
+      m(node, :lit, node.value)
+    end
+
+    def visit_float_node(node)
+      m(node, :lit, node.value)
+    end
+
+    def visit_imaginary_node(node)
+      m(node, :lit, node.value)
+    end
+
+    def visit_rational_node(node)
+      m(node, :lit, node.value)
+    end
+
+    # Variables
 
     def visit_local_variable_read_node(node)
       m(node, :lvar, node.name)
