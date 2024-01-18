@@ -160,10 +160,10 @@ module PrismToRubyParser
           (node.receiver.is_a? Prism::StringNode or
            node.receiver.is_a? Prism::RegularExpressionNode)
 
-      # RP special cases
-      # /x/ =~ 'y'
-      # 'y' =~ /x/
-      return make_match_node(node)
+        # RP special cases
+        # /x/ =~ 'y'
+        # 'y' =~ /x/
+        return make_match_node(node)
       end
 
       type = case
@@ -1082,6 +1082,11 @@ module PrismToRubyParser
     # if /x/
     def visit_match_last_line_node(node)
       m(node, :match, visit_regular_expression_node(node))
+    end
+
+    # /(?<foo>bar)/ =~ baz
+    def visit_match_write_node(node)
+      m_c(node, :match2, visit(node.call.receiver), map_visit(node.call.arguments))
     end
 
     def visit_source_file_node(node)
