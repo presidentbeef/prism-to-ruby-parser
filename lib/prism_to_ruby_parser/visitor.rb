@@ -1245,12 +1245,28 @@ module PrismToRubyParser
     end
 
     def visit_multi_target_node(node)
+      rest = if node.rest
+               if node.rest.expression
+                 :"*#{visit(node.rest.expression)}"
+               else
+                 :'*'
+               end
+             else
+               nil
+             end
+
+      arguments = [
+        map_visit(node.lefts),
+        rest,
+        map_visit(node.rights)
+      ].compact.flatten(1)
+
       if @in_parameters
         # When there is an masgn inside a block parameter list,
         # the variables are not wrapped in an array
-        m_c(node, :masgn, map_visit(node.lefts))
+        m_c(node, :masgn, arguments)
       else
-        m(node, :masgn, m_c(node, :array, map_visit(node.lefts)))
+        m(node, :masgn, m_c(node, :array, arguments))
       end
     end
 
