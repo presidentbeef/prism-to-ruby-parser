@@ -925,6 +925,10 @@ module PrismToRubyParser
       result
     end
 
+    def visit_interpolated_match_last_line_node(node)
+      visit_interpolated_regular_expression_node(node)
+    end
+
     def visit_interpolated_symbol_node(node)
       visit_interpolated_string_node(node)
     end
