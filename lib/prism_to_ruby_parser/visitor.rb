@@ -1127,6 +1127,10 @@ module PrismToRubyParser
       m(node, type, visit(node.left), visit(node.right))
     end
 
+    def visit_missing_node(node)
+      # Parse error
+    end
+
     # Multi-assigns
 
     # @source="x,y = 1,2"
