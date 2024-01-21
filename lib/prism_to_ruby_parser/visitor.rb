@@ -127,6 +127,14 @@ module PrismToRubyParser
     def visit_rescue_node(node)
       exceptions = m_c(node, :array, map_visit(node.exceptions))
 
+      # X => e
+      if node.reference
+        ref = visit(node.reference)
+        ref << Sexp.new(:gvar, :"$!")
+
+        exceptions << ref
+      end
+
       statements = if node.statements
                      visit(node.statements)
                    else
