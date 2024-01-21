@@ -117,6 +117,12 @@ module PrismToRubyParser
         end
       end
 
+      if node.else_clause
+        if node.else_clause.statements
+          result << visit(node.else_clause)
+        end
+      end
+
       if node.ensure_clause
         result = m(node.ensure_clause, :ensure, result, visit(node.ensure_clause))
       end
