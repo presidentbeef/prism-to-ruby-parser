@@ -1394,6 +1394,12 @@ module PrismToRubyParser
         if node.posts
           n.concat map_visit(node.posts)
         end
+
+        # RubyParser drops the 'nil':
+        # s(:array_pat, nil) is just s(:array_pat)
+        if constant.nil? and n.length == 2
+          n.compact!
+        end
       end
     end
 
