@@ -5039,6 +5039,8 @@ module TestRubyParserShared31Plus
   end
 
   def test_call_block_arg_unnamed
+    skip "Prism and Ruby consider this a syntax error"
+
     rb = "x(&)"
     pt = s(:call, nil, :x,
            s(:block_pass).line(1)).line(1)
@@ -5089,6 +5091,8 @@ module TestRubyParserShared32Plus
   include TestRubyParserShared31Plus
 
   def test_args_star__anon_solo
+    skip "Prism and Ruby consider this a syntax error"
+
     rb = "f(*)"
     pt = s(:call, nil, :f, s(:splat))
 
@@ -5096,6 +5100,8 @@ module TestRubyParserShared32Plus
   end
 
   def test_args_star__anon_trailing
+    skip "Prism and Ruby consider this a syntax error"
+
     rb = "f(x, *)"
     pt = s(:call, nil, :f, s(:call, nil, :x), s(:splat))
 
@@ -5103,6 +5109,8 @@ module TestRubyParserShared32Plus
   end
 
   def test_args_dstar__anon_solo
+    skip "Prism and Ruby consider this a syntax error"
+
     rb = "f(**)"
     pt = s(:call, nil, :f, s(:hash, s(:kwsplat))) # TODO double check this
 
@@ -5110,6 +5118,8 @@ module TestRubyParserShared32Plus
   end
 
   def test_args_dstar__anon_trailing
+    skip "Prism and Ruby consider this a syntax error"
+
     rb = "f(x, **)"
     pt = s(:call, nil, :f, s(:call, nil, :x), s(:hash, s(:kwsplat))) # TODO double check this
 
