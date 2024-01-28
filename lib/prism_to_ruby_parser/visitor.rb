@@ -358,6 +358,15 @@ module PrismToRubyParser
       if node.parameters
         visit(node.parameters).tap do |params|
           params << shadows if shadows
+
+          # Feels silly
+          params.map! do |param|
+            if param == s(:kwrest, :'**nil')
+              :'**nil'
+            else
+              param
+            end
+          end
         end
       elsif shadows # only shadowed params
         m(node, :args, shadows)
@@ -712,6 +721,16 @@ module PrismToRubyParser
         n << visit(node.block) if node.block # Block argument
 
         @in_parameters = false
+
+        # Feels silly
+        n.map! do |param|
+          if param == s(:kwrest, :'**nil')
+            :'**nil'
+          else
+            param
+          end
+        end
+
       end
     end
 
