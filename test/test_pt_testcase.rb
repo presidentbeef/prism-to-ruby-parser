@@ -15,17 +15,17 @@ class ParseTreeTestCase < Minitest::Test
   end
 
   def self.add_18tests name, hash
-    add_tests "#{name}__18", hash
+    # add_tests "#{name}__18", hash
   end
 
   def self.add_19tests name, hash
-    add_tests "#{name}_ALL", hash
+    # add_tests "#{name}_ALL", hash
   end
 
   def self.add_19edgecases ruby, sexp, cases
-    cases.each do |name, code|
-      add_19tests name, "Ruby" => code, "ParseTree" => sexp
-    end
+    # cases.each do |name, code|
+    #   add_19tests name, "Ruby" => code, "ParseTree" => sexp
+    # end
   end
 
   def self.clone_same

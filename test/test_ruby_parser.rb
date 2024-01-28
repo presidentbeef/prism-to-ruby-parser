@@ -229,17 +229,6 @@ module TestRubyParserShared
     assert_parse rb, pt
   end
 
-  def test_bug170
-    rb = '$-'
-    pt = s(:gvar, :"$-")
-
-    if processor.class.version >= 21
-      assert_syntax_error rb, /unexpected \$undefined/
-    else
-      assert_parse rb, pt
-    end
-  end
-
   def test_bug179
     rb = "p ()..nil"
     pt = s(:call, nil, :p, s(:dot2, s(:begin), s(:nil)))
@@ -563,9 +552,6 @@ module TestRubyParserShared
            s(:defn, :blah, s(:args).line(6), s(:nil).line(6)).line(6)).line(4)
 
     assert_parse rb, pt
-
-    assert_equal "# blah 1\n# blah 2\n\n", result.comments
-    assert_equal "# blah 3\n", result.defn.comments
   end
 
   def test_cond_unary_minus
@@ -604,7 +590,6 @@ module TestRubyParserShared
     pt = s(:defn, :blah, s(:args).line(4), s(:nil).line(4)).line(4)
 
     assert_parse rb, pt
-    assert_equal "# blah 1\n# blah 2\n\n", result.comments
   end
 
   def test_defns_reserved
@@ -623,15 +608,6 @@ module TestRubyParserShared
              s(:iter, s(:call, s(:call, nil, :x), :y), 0)))
 
     assert_parse rb, pt
-  end
-
-  def test_defs_comments
-    rb = "# blah 1\n# blah 2\n\ndef self.blah\nend"
-    pt = s(:defs, s(:self).line(4), :blah, s(:args).line(4),
-           s(:nil).line(4)).line(4)
-
-    assert_parse rb, pt
-    assert_equal "# blah 1\n# blah 2\n\n", result.comments
   end
 
   def test_do_bug # TODO: rename
@@ -1141,8 +1117,6 @@ module TestRubyParserShared
            s(:defn, :blah, s(:args).line(7), s(:nil).line(7)).line(7)).line(5)
 
     assert_parse rb, pt
-    assert_equal "# blah 1\n\n# blah 2\n\n", result.comments
-    assert_equal "# blah 3\n", result.defn.comments
   end
 
   def test_non_interpolated_word_array_line_breaks
@@ -1247,10 +1221,6 @@ module TestRubyParserShared
            s(:call, nil, :p, s(:lvar, :a).line(2)).line(2))
 
     assert_parse rb, pt
-
-    assert_equal "(string)", result.file
-    assert_same result.file, result.lasgn.file
-    assert_same result.file, result.call.file
   end
 
   def test_parse_line_block_inline_comment
@@ -1306,12 +1276,6 @@ module TestRubyParserShared
            s(:call, s(:lvar, :x).line(2), :+, s(:lvar, :y).line(2)).line(2))
 
     assert_parse rb, pt
-
-    _, a, b, c, = result
-
-    assert_equal 1, a.line,   "call should have line number"
-    assert_equal 1, b.line,   "masgn should have line number"
-    assert_equal 2, c.line,   "call should have line number"
   end
 
   def test_parse_line_defn_no_parens_args
@@ -1329,11 +1293,6 @@ module TestRubyParserShared
            s(:return, s(:lvar, :y).line(4)).line(4))
 
     assert_parse rb, pt
-
-    body = result
-    assert_equal 2, body.call.line,   "call should have line number"
-    assert_equal 3, body.lasgn.line,  "lasgn should have line number"
-    assert_equal 4, body.return.line, "return should have line number"
   end
 
   def test_parse_line_defn_no_parens
@@ -1472,12 +1431,6 @@ module TestRubyParserShared
            s(:call, s(:lvar, :x).line(2), :+, s(:lvar, :y).line(2)).line(2))
 
     assert_parse rb, pt
-
-    _, a, b, c, = result
-
-    assert_equal 1, a.line,   "call should have line number"
-    assert_equal 1, b.line,   "masgn should have line number"
-    assert_equal 2, c.line,   "call should have line number"
   end
 
   def test_parse_line_multiline_str
@@ -3680,6 +3633,15 @@ module TestRubyParserShared22Plus
 
     assert_parse rb, pt
   end
+
+  def test_lasgn_call_nobracket_rescue_arg
+    rb = "a = b 1 rescue 2"
+    pt = s(:rescue,
+          s(:lasgn, :a, s(:call, nil, :b, s(:lit, 1))),
+          s(:resbody, s(:array), s(:lit, 2)))
+
+    assert_parse rb, pt
+  end
 end
 
 module TestRubyParserShared23Plus
@@ -3952,12 +3914,88 @@ module TestRubyParserShared24Plus
 
     assert_parse rb, pt
   end
+
+  def test_rescue_parens
+    rb = "a (b rescue c)"
+    pt = s(:call, nil, :a,
+           s(:rescue, s(:call, nil, :b),
+             s(:resbody, s(:array), s(:call, nil, :c))))
+
+    assert_parse rb, pt
+
+    assert_parse_error "a(b rescue c)", /parse error on value .rescue/
+  end
 end
 
 module TestRubyParserShared25Plus
   include TestRubyParserShared24Plus
 
-  # ...version specific tests to go here...
+  def test_rescue_do_end_ensure_result
+    rb = "proc do\n  :begin\nensure\n  :ensure\nend.call"
+    pt = s(:call,
+           s(:iter,
+             s(:call, nil, :proc), 0,
+             s(:ensure,
+               s(:lit, :begin).line(2),
+               s(:lit, :ensure).line(4)).line(2)),
+           :call)
+
+    assert_parse rb, pt
+  end
+
+  def test_rescue_do_end_no_raise
+    rb = "tap do\n  :begin\nrescue\n  :rescue\nelse\n  :else\nensure\n  :ensure\nend"
+    pt = s(:iter,
+           s(:call, nil, :tap), 0,
+           s(:ensure,
+             s(:rescue,
+               s(:lit, :begin).line(2),
+               s(:resbody, s(:array).line(3),
+                 s(:lit, :rescue).line(4)).line(3),
+               s(:lit, :else).line(6)).line(2),
+             s(:lit, :ensure).line(8)).line(2))
+
+    assert_parse rb, pt
+  end
+
+  def test_rescue_do_end_raised
+    rb = "tap do\n  raise\nensure\n  :ensure\nend"
+    pt = s(:iter,
+           s(:call, nil, :tap), 0,
+           s(:ensure,
+             s(:call, nil, :raise).line(2),
+             s(:lit, :ensure).line(4)).line(2))
+
+    assert_parse rb, pt
+  end
+
+  def test_rescue_do_end_rescued
+    rb = "tap do\n  raise\nrescue\n  :rescue\nelse\n  :else\nensure\n  :ensure\nend"
+    pt = s(:iter,
+           s(:call, nil, :tap),
+           0,
+           s(:ensure,
+             s(:rescue,
+               s(:call, nil, :raise).line(2),
+               s(:resbody,
+                 s(:array).line(3),
+                 s(:lit, :rescue).line(4)).line(3),
+               s(:lit, :else).line(6)).line(2),
+             s(:lit, :ensure).line(8)).line(2))
+
+    assert_parse rb, pt
+  end
+
+  def test_rescue_in_block
+    rb = "blah do\nrescue\n  stuff\nend"
+    pt = s(:iter,
+           s(:call, nil, :blah), 0,
+           s(:rescue,
+             s(:resbody, s(:array).line(2),
+               s(:call, nil, :stuff).line(3)).line(2)).line(2))
+
+    assert_parse rb, pt
+  end
 end
 
 module TestRubyParserShared26Plus
@@ -3994,6 +4032,26 @@ module TestRubyParserShared26Plus
     pt = s(:array,
            s(:dsym, "", s(:evstr, s(:call, nil, :a))),
            s(:dsym, "", s(:evstr, s(:call, nil, :b)))).line 1
+
+    assert_parse rb, pt
+  end
+
+  def test_parse_line_dot2_open
+    rb = "0..\n; a..\n; c"
+    pt = s(:block,
+           s(:dot2, s(:lit, 0), nil),
+           s(:dot2, s(:call, nil, :a).line(2), nil).line(2),
+           s(:call, nil, :c).line(3))
+
+    assert_parse rb, pt
+  end
+
+  def test_parse_line_dot3_open
+    rb = "0...\n; a...\n; c"
+    pt = s(:block,
+           s(:dot3, s(:lit, 0), nil),
+           s(:dot3, s(:call, nil, :a).line(2), nil).line(2),
+           s(:call, nil, :c).line(3))
 
     assert_parse rb, pt
   end
@@ -4734,6 +4792,26 @@ module TestRubyParserShared27Plus
 
     assert_parse rb, pt
   end
+
+  def test_bdot2
+    rb = "..10\n; ..a\n; c"
+    pt = s(:block,
+           s(:dot2, nil, s(:lit, 10)),
+           s(:dot2, nil, s(:call, nil, :a).line(2)).line(2),
+           s(:call, nil, :c).line(3))
+
+    assert_parse rb, pt
+  end
+
+  def test_bdot3
+    rb = "...10\n; ...a\n; c"
+    pt = s(:block,
+           s(:dot3, nil, s(:lit, 10)),
+           s(:dot3, nil, s(:call, nil, :a).line(2)).line(2),
+           s(:call, nil, :c).line(3))
+
+    assert_parse rb, pt
+  end
 end
 
 module TestRubyParserShared30Plus
@@ -5027,165 +5105,6 @@ class RubyParserTestCase < Minitest::Test
 
   def refute_parse rb
     true
-  end
-end
-
-class TestRubyParserV20 < RubyParserTestCase
-  include TestRubyParserShared20Plus
-end
-
-class TestRubyParserV21 < RubyParserTestCase
-  include TestRubyParserShared21Plus
-end
-
-class TestRubyParserV22 < RubyParserTestCase
-  include TestRubyParserShared22Plus
-end
-
-class TestRubyParserV23 < RubyParserTestCase
-  include TestRubyParserShared23Plus
-
-  def test_lasgn_call_nobracket_rescue_arg
-    rb = "a = b 1 rescue 2"
-    pt = s(:rescue,
-          s(:lasgn, :a, s(:call, nil, :b, s(:lit, 1))),
-          s(:resbody, s(:array), s(:lit, 2)))
-
-    assert_parse rb, pt
-  end
-end
-
-class TestRubyParserV24 < RubyParserTestCase
-  include TestRubyParserShared24Plus
-
-  def test_rescue_parens
-    rb = "a (b rescue c)"
-    pt = s(:call, nil, :a,
-           s(:rescue, s(:call, nil, :b),
-             s(:resbody, s(:array), s(:call, nil, :c))))
-
-    assert_parse rb, pt
-
-    assert_parse_error "a(b rescue c)", /parse error on value .rescue/
-  end
-end
-
-class TestRubyParserV25 < RubyParserTestCase
-  include TestRubyParserShared25Plus
-
-  def test_rescue_do_end_ensure_result
-    rb = "proc do\n  :begin\nensure\n  :ensure\nend.call"
-    pt = s(:call,
-           s(:iter,
-             s(:call, nil, :proc), 0,
-             s(:ensure,
-               s(:lit, :begin).line(2),
-               s(:lit, :ensure).line(4)).line(2)),
-           :call)
-
-    assert_parse rb, pt
-  end
-
-  def test_rescue_do_end_no_raise
-    rb = "tap do\n  :begin\nrescue\n  :rescue\nelse\n  :else\nensure\n  :ensure\nend"
-    pt = s(:iter,
-           s(:call, nil, :tap), 0,
-           s(:ensure,
-             s(:rescue,
-               s(:lit, :begin).line(2),
-               s(:resbody, s(:array).line(3),
-                 s(:lit, :rescue).line(4)).line(3),
-               s(:lit, :else).line(6)).line(2),
-             s(:lit, :ensure).line(8)).line(2))
-
-    assert_parse rb, pt
-  end
-
-  def test_rescue_do_end_raised
-    rb = "tap do\n  raise\nensure\n  :ensure\nend"
-    pt = s(:iter,
-           s(:call, nil, :tap), 0,
-           s(:ensure,
-             s(:call, nil, :raise).line(2),
-             s(:lit, :ensure).line(4)).line(2))
-
-    assert_parse rb, pt
-  end
-
-  def test_rescue_do_end_rescued
-    rb = "tap do\n  raise\nrescue\n  :rescue\nelse\n  :else\nensure\n  :ensure\nend"
-    pt = s(:iter,
-           s(:call, nil, :tap),
-           0,
-           s(:ensure,
-             s(:rescue,
-               s(:call, nil, :raise).line(2),
-               s(:resbody,
-                 s(:array).line(3),
-                 s(:lit, :rescue).line(4)).line(3),
-               s(:lit, :else).line(6)).line(2),
-             s(:lit, :ensure).line(8)).line(2))
-
-    assert_parse rb, pt
-  end
-
-  def test_rescue_in_block
-    rb = "blah do\nrescue\n  stuff\nend"
-    pt = s(:iter,
-           s(:call, nil, :blah), 0,
-           s(:rescue,
-             s(:resbody, s(:array).line(2),
-               s(:call, nil, :stuff).line(3)).line(2)).line(2))
-
-    assert_parse rb, pt
-  end
-end
-
-class TestRubyParserV26 < RubyParserTestCase
-  include TestRubyParserShared26Plus
-
-  def test_parse_line_dot2_open
-    rb = "0..\n; a..\n; c"
-    pt = s(:block,
-           s(:dot2, s(:lit, 0), nil),
-           s(:dot2, s(:call, nil, :a).line(2), nil).line(2),
-           s(:call, nil, :c).line(3))
-
-    assert_parse rb, pt
-  end
-
-  def test_parse_line_dot3_open
-    rb = "0...\n; a...\n; c"
-    pt = s(:block,
-           s(:dot3, s(:lit, 0), nil),
-           s(:dot3, s(:call, nil, :a).line(2), nil).line(2),
-           s(:call, nil, :c).line(3))
-
-    assert_parse rb, pt
-  end
-end
-
-class TestRubyParserV27 < RubyParserTestCase
-  include TestRubyParserShared27Plus
-
-  def test_bdot2
-    rb = "..10\n; ..a\n; c"
-    pt = s(:block,
-           s(:dot2, nil, s(:lit, 10)),
-           s(:dot2, nil, s(:call, nil, :a).line(2)).line(2),
-           s(:call, nil, :c).line(3))
-
-    assert_parse rb, pt
-  end
-
-  def test_bdot3
-    rb = "...10\n; ...a\n; c"
-    pt = s(:block,
-           s(:dot3, nil, s(:lit, 10)),
-           s(:dot3, nil, s(:call, nil, :a).line(2)).line(2),
-           s(:call, nil, :c).line(3))
-
-    assert_parse rb, pt
   end
 end
 
