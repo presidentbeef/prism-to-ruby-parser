@@ -13,7 +13,9 @@ module PrismToRubyParser
     # Create Sexp with given type, set line based
     # on Prism node, and append the rest of the arguments
     def m(p_node, type, *)
-      raise 'Pass Prism node as first argument' unless p_node.is_a? Prism::Node
+      unless p_node.is_a? Prism::Node
+        raise "Pass Prism node as first argument, not #{p_node.inspect}"
+      end
 
       Sexp.new(type, *).tap do |n|
         yield n if block_given?
@@ -27,7 +29,9 @@ module PrismToRubyParser
     # This is generally better than splatting the last argument,
     # especially if the last argument is long.
     def m_c(p_node, type, *, concat_arg)
-      raise 'Pass Prism node as first argument' unless p_node.is_a? Prism::Node
+      unless p_node.is_a? Prism::Node
+        raise "Pass Prism node as first argument, not `#{p_node.inspect}`"
+      end
 
       m(p_node, type, *) do |n|
         if concat_arg # might be nil
