@@ -1079,6 +1079,9 @@ module TestRubyParserShared
   end
 
   def test_masgn_colon3
+    skip "This looks like a straight-up bug or oversight in RubyParser"
+    # https://github.com/seattlerb/ruby_parser/blob/b07cac0797402f39e1712cd1779091aa6102688d/lib/ruby_parser3.yy#L731
+
     rb = "::A, ::B = 1, 2"
     pt = s(:masgn,
            s(:array, s(:const, nil, s(:colon3, :A)), s(:const, s(:colon3, :B))),

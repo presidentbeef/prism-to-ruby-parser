@@ -2473,6 +2473,8 @@ class ParseTreeTestCase < Minitest::Test
             "Ruby"         => "x = *[1]",
             "ParseTree"    => s(:lasgn, :x, s(:svalue, s(:splat, s(:array, s(:lit, 1))))))
 
+  # Prism does not distinguish this case from the above
+  # whatsoever
   add_tests("splat_lasgn_array",
             "Ruby"         => "x = [*[1]]",
             "ParseTree"    => s(:lasgn, :x, s(:array, s(:splat, s(:array, s(:lit, 1))))))
