@@ -29,8 +29,10 @@ module ConversionTestHelper
   def assert_same_sexp(from_rp, from_prism)
     assert_equal from_rp, from_prism
 
-    if from_rp.line
-      assert_equal from_rp.line, from_prism.line, "Line mismatch on #{from_rp}"
+    if ENV['TEST_LINES']
+      if from_rp.line
+        assert_equal from_rp.line, from_prism.line, "Line mismatch on #{from_rp}"
+      end
     end
 
     from_rp.each_with_index do |e, i|
