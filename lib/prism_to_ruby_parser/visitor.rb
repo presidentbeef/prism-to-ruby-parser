@@ -156,12 +156,12 @@ module PrismToRubyParser
       end
 
       statements = if node.statements
-                     visit(node.statements)
+                     visit_statements_node(node.statements, bare: true)
                    else
-                     nil
+                     [nil] # To use m_c below
                    end
 
-      m(node, :resbody, exceptions, statements)
+      m_c(node, :resbody, exceptions, statements)
     end
 
     def visit_rescue_modifier_node(node)
