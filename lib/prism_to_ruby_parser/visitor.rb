@@ -128,7 +128,11 @@ module PrismToRubyParser
       end
 
       if node.ensure_clause
-        result = m(node.ensure_clause, :ensure, result, visit(node.ensure_clause))
+        if result != s(:nil) # Omit, but only if there is no else or rescue
+          result = m(node.ensure_clause, :ensure, result, visit(node.ensure_clause))
+        else
+          result = m(node.ensure_clause, :ensure, visit(node.ensure_clause))
+        end
       end
 
       result
