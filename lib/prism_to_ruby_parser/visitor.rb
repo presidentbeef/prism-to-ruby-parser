@@ -480,7 +480,7 @@ module PrismToRubyParser
       # RP will convert range nodes with integers _on both ends_
       # to a literal range
       # Copying logic straight from RP
-      if left and right and left.sexp_type == :lit and right.sexp_type == :lit and Integer === left.last and Integer === right.last
+      if not @in_pattern and left and right and left.sexp_type == :lit and right.sexp_type == :lit and Integer === left.last and Integer === right.last
 
         if node.exclude_end?
           m(node, :lit, (left.last...right.last))
@@ -748,7 +748,11 @@ module PrismToRubyParser
 
     # lambda { |a, | }
     def visit_implicit_rest_node(node)
-      nil # This is how RP does it
+      if @in_pattern # case ... in [a,] ...
+        :'*'
+      else
+        nil # This is how RP does it
+      end
     end
 
     def visit_required_keyword_parameter_node(node)
@@ -1350,11 +1354,15 @@ module PrismToRubyParser
     end
 
     def visit_in_node(node)
+      @in_pattern = true # RP treats some things differently
+
       pattern = if node.pattern.is_a? Prism::ConstantPathNode
                   visit_pattern_constant(node.pattern)
                 else
                   visit(node.pattern)
                 end
+
+      @in_pattern = false
 
       m(node, :in, pattern).tap do |n|
         if node.statements
