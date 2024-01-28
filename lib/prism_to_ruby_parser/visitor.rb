@@ -111,9 +111,9 @@ module PrismToRubyParser
 
       if node.rescue_clause
         if node.statements
-          result = m(node.rescue_clause, :rescue, result, visit(node.rescue_clause))
+          result = m_c(node.rescue_clause, :rescue, result, visit_rescues(node.rescue_clause))
         else
-          result = m(node.rescue_clause, :rescue, visit(node.rescue_clause))
+          result = m_c(node.rescue_clause, :rescue, visit_rescues(node.rescue_clause))
         end
       end
 
@@ -128,6 +128,20 @@ module PrismToRubyParser
       end
 
       result
+    end
+
+    # Convert rescue trees to rescue lists
+    def visit_rescues(node)
+      rescues = []
+      current = node
+
+      while current
+        rescues << visit(current)
+
+        current = current.consequent
+      end
+
+      rescues
     end
 
     def visit_rescue_node(node)

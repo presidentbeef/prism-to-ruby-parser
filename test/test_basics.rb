@@ -293,4 +293,8 @@ class BasicTests < Minitest::Test
   def test_imaginary_numbers
     assert_sexp('0b10i')
   end
+
+  def test_rescue_rescue
+    assert_sexp("begin\n rescue\n x\nrescue\n end")
+  end
 end
