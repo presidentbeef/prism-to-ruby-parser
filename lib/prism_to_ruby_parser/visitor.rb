@@ -477,6 +477,11 @@ module PrismToRubyParser
       left = node.left && visit(node.left)
       right = node.right && visit(node.right)
 
+      if left == s(:nil)
+        # https://github.com/seattlerb/ruby_parser/commit/9441a89aa366265ca08dc0cd16545f69ea2c0195
+        left = m(node.left, :begin)
+      end
+
       # RP will convert range nodes with integers _on both ends_
       # to a literal range
       # Copying logic straight from RP
