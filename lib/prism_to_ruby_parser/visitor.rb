@@ -234,7 +234,13 @@ module PrismToRubyParser
 
     # E.g. `a[1] += 1`
     def visit_index_operator_write_node(node)
-      arglist = m_c(node.arguments, :arglist, visit(node.arguments))
+      arglist = if node.arguments
+                  m_c(node.arguments, :arglist, visit(node.arguments))
+                else
+                  # No index argument...
+                  # a[] += 1
+                  nil
+                end
 
       m(node,
         :op_asgn1,
