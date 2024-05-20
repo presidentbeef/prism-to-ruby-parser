@@ -1,3 +1,7 @@
+# Archived
+
+This functionality is built into Prism now, so no need to use this repo!
+
 # RubyParser Compatibility for Prism
 
 [Prism](https://github.com/ruby/prism) is a new portable Ruby parser included in the Ruby standard library.
